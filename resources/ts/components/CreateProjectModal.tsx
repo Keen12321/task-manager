@@ -23,7 +23,7 @@ const CreateProjectModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Cre
       name,
       description,
       status,
-      due_date: dueDate,
+      due_date: new Date(dueDate),
     };
     
     onSubmit(projectData);

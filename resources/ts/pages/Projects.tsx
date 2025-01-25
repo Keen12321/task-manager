@@ -23,13 +23,13 @@ const Project = () => {
     { name: 'DUE DATE', key: 'due_date' },
     { name: 'CREATE DATE', key: 'created_at' },
   ];
-  const projects = useSelector((state: RootState) => state.project.projects || []) as User[];;
-  const transformedProjects = (projects).map((project: ProjectType) => ({
+  const projects = useSelector((state: RootState) => state.project.projects);
+  const transformedProjects = (projects as ProjectType[]).map((project: ProjectType) => ({
     id: project.id,
     name: project.name,
     description: project.description,
     status: project.status,
-    due_date: project.due_date,
+    due_date: format(project.due_date, 'MM-dd-yyyy'),
     created_at: format(project.created_at, 'MM-dd-yyyy'),
   }));
 

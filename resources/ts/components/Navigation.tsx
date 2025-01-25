@@ -83,7 +83,7 @@ const Navigation = () => {
             <button
               className="flex bg-transparent text-white border border-white rounded-full py-2 px-4"
             >
-              <span className="flex-shrink-0">{ currentUser ? currentUser.name : 'Guest' }</span>
+              <span className="flex-shrink-0">{ currentUser && 'name' in currentUser ? currentUser.name : 'Guest' }</span>
               <span className="ml-4">&#9660;</span>
             </button>
             {currentUser && (
