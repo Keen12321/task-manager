@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import DeleteConfirmationDialog from "../common/modals/DeleteConfirmationDialog";
 import PageHeader from "../common/PageHeader";
 import Table from "../common/Table";
-import TaskModal from "../task/TaskModal";
+import TaskModal from "./TaskModal";
 import { createTask, deleteTask, findTask, updateTask } from "../../features/task/taskActions";
 import { Task, TaskPayload } from "../../features/task/taskTypes";
 import { AppDispatch, RootState } from "../../store";
@@ -25,13 +25,11 @@ const TaskManagementPage = ({
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
 
   const headers = [
-    { name: 'ID', key: 'id' },
-    { name: 'NAME', key: 'name' },
-    { name: 'DESCRIPTION', key: 'description' },
-    { name: 'STATUS', key: 'status' },
-    { name: 'DUE DATE', key: 'due_date' },
-    { name: 'CREATE DATE', key: 'created_at' },
-    { name: '', key: 'actions' },
+    { name: 'ID', key: 'id', width: 5 },
+    { name: 'PROJECT NAME', key: 'project', width: 15 },
+    { name: 'NAME', key: 'name', width: 35 },
+    { name: 'STATUS', key: 'status', width: 20 },
+    { name: 'DUE DATE', key: 'due_date', width: 10 },
   ]
   
   const tasks = useSelector(tasksSelector);
@@ -39,11 +37,10 @@ const TaskManagementPage = ({
     
   const transformedTasks = (tasks as Task[]).map((task: Task) => ({
     id: task.id,
+    project: task.project.name,
     name: task.name,
-    description: task.description,
     status: task.status,
     due_date: format(task.due_date, 'M-dd-yyyy'),
-    created_at: format(task.created_at, 'M-dd-yyyy'),
   }));
   
   const openModal = (id: number | null = null) => {
@@ -91,7 +88,7 @@ const TaskManagementPage = ({
       }
     }
   };
-  
+
   const handleConfirmDelete = () => {
     if (deleteItemId) {
       dispatch(deleteTask(deleteItemId));
@@ -129,7 +126,13 @@ const TaskManagementPage = ({
         onConfirm={handleConfirmDelete}
       />
       <div className="lg:max-w-[75%] mx-auto py-4">
-        <Table headers={headers} rows={transformedTasks} onUpdate={openModal} onDelete={openDeleteDialog} />
+        <Table
+          headers={headers}
+          rows={transformedTasks}
+          dataType="task"
+          onUpdate={openModal}
+          onDelete={openDeleteDialog}
+        />
       </div>
     </div>
   );

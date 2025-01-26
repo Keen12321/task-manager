@@ -72,7 +72,7 @@ const Navigation = () => {
                 key={tab.key}
                 to={tab.link}
                 className={`cursor-pointer text-lg font-medium block lg:w-auto text-center lg:text-left py-2 px-4 w-full ${
-                  activeTab === tab.key ? 'border-b-2 border-blue-500' : ''
+                  activeTab === tab.key ? 'border-b-2 border-blue' : ''
                 }`}
               >
                 { tab.name }
@@ -115,7 +115,7 @@ const Navigation = () => {
             key={tab.key}
             to={tab.link}
             className={`cursor-pointer py-2 px-4 text-lg font-medium block w-full lg:w-auto text-center lg:text-left ${
-              activeTab === tab.key ? 'border-b-2 border-blue-500' : ''
+              activeTab === tab.key ? 'border-b-2 border-blue' : ''
             }`}
             onClick={() => setActiveTab(tab.key)}
           >

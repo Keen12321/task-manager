@@ -22,8 +22,7 @@ const Projects = () => {
 
   const headers: TableHeader[] = [
     { name: 'ID', key: 'id' },
-    { name: 'NAME', key: 'name' },
-    { name: 'DESCRIPTION', key: 'description' },
+    { name: 'NAME', key: 'name', width: 40 },
     { name: 'STATUS', key: 'status' },
     { name: 'DUE DATE', key: 'due_date' },
     { name: 'CREATE DATE', key: 'created_at' },
@@ -64,13 +63,6 @@ const Projects = () => {
     setIsDialogOpen(false);
   };
 
-  useEffect(() => {
-    if (projectToEdit) {
-      setSelectedProject(projectToEdit);
-      console.log(selectedProject)
-    }
-  }, [projectToEdit]);
-
   const handleSubmit = async (projectData: ProjectPayload) => {
     setIsLoading(true);
     setError(null);
@@ -104,6 +96,13 @@ const Projects = () => {
   };
 
   useEffect(() => {
+    if (projectToEdit) {
+      setSelectedProject(projectToEdit);
+      console.log(selectedProject)
+    }
+  }, [projectToEdit]);
+
+  useEffect(() => {
     dispatch(getProjects);
   }, [dispatch]);
 
@@ -130,7 +129,13 @@ const Projects = () => {
         onConfirm={handleConfirmDelete}
       />
       <div className="lg:max-w-[75%] mx-auto py-4">
-        <Table headers={headers} rows={transformedProjects} onUpdate={openModal} onDelete={openDeleteDialog} />
+        <Table
+          headers={headers}
+          rows={transformedProjects}
+          dataType="project"
+          onUpdate={openModal}
+          onDelete={openDeleteDialog}
+        />
       </div>
     </div>
   )

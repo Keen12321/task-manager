@@ -1,35 +1,72 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import PageHeader from "../components/common/PageHeader";
 import Table from "../components/common/Table";
 import TaskCard from "../components/dashboard/TaskCard";
-import { getUserTasks } from '../features/task/taskActions';
+import { getTasks, getUserTasks } from '../features/task/taskActions';
 import { Task } from '../features/task/taskTypes';
 import { AppDispatch, RootState } from '../store';
 
 const Dashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
 
+  const [filteredUserTasks, setFilteredUserTasks] = useState({
+    pending: 0,
+    inProgress: 0,
+    completed: 0,
+  })
+  const [filteredTotalTasks, setFilteredTotalTasks] = useState({
+    pending: 0,
+    inProgress: 0,
+    completed: 0,
+  })
+
   const headers: TableHeader[] = [
-    { name: 'ID', key: 'id' },
-    { name: 'NAME', key: 'name' },
-    { name: 'DESCRIPTION', key: 'description' },
-    { name: 'STATUS', key: 'status' },
-    { name: 'DUE DATE', key: 'due_date' },
-    { name: 'CREATE DATE', key: 'created_at' },
+    { name: 'ID', key: 'id', width: 5 },
+    { name: 'PROJECT NAME', key: 'project', width: 15 },
+    { name: 'NAME', key: 'name', width: 35 },
+    { name: 'STATUS', key: 'status', width: 20 },
+    { name: 'DUE DATE', key: 'due_date', width: 10 },
   ];
+
   const userTasks = useSelector((state: RootState) => state.task.userTasks);
+  const totalTasks = useSelector((state: RootState) => state.task.tasks);
+  
   const transformedTasks = (userTasks as Task[]).map((task: Task) => ({
     id: task.id,
+    project: task.project.name,
     name: task.name,
-    description: task.description,
     status: task.status,
     due_date: format(task.due_date, 'M-dd-yyyy'),
-    created_at: format(task.created_at, 'M-dd-yyyy'),
   }));
 
   useEffect(() => {
+    const statusCounts = { pending: 0, inProgress: 0, completed: 0 };
+
+    userTasks.forEach((task: Task) => {
+      if (task.status === 'pending') statusCounts.pending += 1;
+      if (task.status === 'in_progress') statusCounts.inProgress += 1;
+      if (task.status === 'completed') statusCounts.completed += 1;
+    });
+
+    setFilteredUserTasks(statusCounts);
+  }, [userTasks]);
+
+  useEffect(() => {
+    const statusCounts = { pending: 0, inProgress: 0, completed: 0 };
+
+    totalTasks.forEach((task: Task) => {
+      if (task.status === 'pending') statusCounts.pending += 1;
+      if (task.status === 'in_progress') statusCounts.inProgress += 1;
+      if (task.status === 'completed') statusCounts.completed += 1;
+    });
+
+    setFilteredTotalTasks(statusCounts);
+  }, [totalTasks]);
+
+  useEffect(() => {
+    getTasks(dispatch);
     getUserTasks(dispatch); 
   }, [dispatch]);
 
@@ -42,26 +79,26 @@ const Dashboard = () => {
         <div className="flex flex-col lg:flex-row justify-between w-full py-4">
           <TaskCard
             title="Pending Tasks"
-            titleColor="text-yellow-500"
-            userTasks={3}
-            totalTasks={5}
+            titleColor="text-yellow"
+            userTasks={filteredUserTasks.pending}
+            totalTasks={filteredTotalTasks.pending}
           />
           <TaskCard
             title="In Progress Tasks"
-            titleColor="text-blue-500"
-            userTasks={3}
-            totalTasks={5}
+            titleColor="text-blue"
+            userTasks={filteredUserTasks.inProgress}
+            totalTasks={filteredTotalTasks.inProgress}
           />
           <TaskCard
             title="Completed Tasks"
-            titleColor="text-green-500"
-            userTasks={3}
-            totalTasks={5}
+            titleColor="text-green"
+            userTasks={filteredUserTasks.completed}
+            totalTasks={filteredTotalTasks.completed}
           />
         </div>
         <div className="w-full p-6 bg-gray-800">
           <h2 className="text-xl mb-4">My Active Tasks</h2>
-          <Table headers={headers} rows={transformedTasks} />
+          <Table headers={headers} rows={transformedTasks} dataType="task"/>
         </div>
       </div>
     </div>

@@ -5,8 +5,16 @@ interface TaskPayload {
     status: string;
     priority: string;
     due_date: Date;
-    assigned_to: string;
-    project_id: string;
+    assigned_to: number | string;
+    project_id: number | string;
+    assigned?: {
+        id: number;
+        name: string
+    };
+    project?: {
+        id: number;
+        name: string;
+    };
 }
 
 // Action Types
@@ -77,8 +85,16 @@ type Task = {
     priority: string;
     due_date: Date;
     created_at: Date;
-    assigned_to: string;
-    project_id: string;
+    assigned_to: number ;
+    project_id: number ;
+    assigned: {
+        id: number ;
+        name: string
+    };
+    project: {
+        id: number ;
+        name: string;
+    };
 }
   
 // Export types and interfaces

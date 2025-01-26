@@ -11,20 +11,59 @@ class TaskController extends Controller
 {
     public function index()
     {
-        $tasks = Task::all();
-        return response()->json($tasks);
+        $tasks = Task::with(['assignedUser', 'project'])->get();
+
+        return response()->json($tasks->map(function ($task) {
+            return [
+                'id' => $task->id,
+                'name' => $task->name,
+                'description' => $task->description,
+                'status' => $task->status,
+                'due_date' => $task->due_date,
+                'assigned_to' => $task->assigned_to,
+                'project_id' => $task->project_id,
+                'assigned' => [
+                    'id' => $task->assignedUser->id,
+                    'name' => $task->assignedUser->name,
+                ],
+                'project' => [
+                    'id' => $task->project->id,
+                    'name' => $task->project->name,
+                ],
+            ];
+        }));
     }
+
 
     public function find($id)
     {
-        $task = Task::findOrFail($id);
+        $task = Task::with(['assignedUser', 'project'])->findOrFail($id);
+        
+        
         return response()->json($task);
     }
 
     public function getTasksByUser(Request $request)
     {
-        $tasks = Task::where('assigned_to', $request->user()->id)->get();
-        return response()->json($tasks);
+        $tasks = Task::where('assigned_to', $request->user()->id)->with(['assignedUser', 'project'])->get();
+
+        return response()->json($tasks->map(function ($task) {
+            return [
+                'id' => $task->id,
+                'name' => $task->name,
+                'description' => $task->description,
+                'status' => $task->status,
+                'due_date' => $task->due_date,
+                'assigned_to' => [
+                    'id' => $task->assignedUser->id,
+                    'name' => $task->assignedUser->name,
+                ],
+                'project' => [
+                    'id' => $task->project->id,
+                    'name' => $task->project->name,
+                ],
+            ];
+        }));
     }
 
     public function create(Request $request)
@@ -72,7 +111,7 @@ class TaskController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
     
-        $task = Task::findOrFail($id);
+        $task = Task::with(['assignedUser', 'project'])->findOrFail($id);
 
         $task->update([
             'name' => $request->has('name') ? $request->name : $task->name,
