@@ -18,21 +18,21 @@ export const CREATE_USER = 'CREATE_USER';
 export const GET_USERS = 'GET_USERS';
   
 // Action Interfaces
-export interface UserLoginAction {
+interface UserLoginAction {
     type: typeof LOGIN_USER;
     payload: LoginPayload;
 }
 
-export interface UserLogoutAction {
+interface UserLogoutAction {
     type: typeof LOGOUT_USER;
 }
 
-export interface CreateUserAction {
+interface CreateUserAction {
     type: typeof CREATE_USER;
-    payload: UserPayload;
+    payload: User;
 }
 
-export interface GetUsersAction {
+interface GetUsersAction {
     type: typeof GET_USERS;
     payload: User[];
 }

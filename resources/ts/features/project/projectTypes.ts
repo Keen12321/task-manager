@@ -9,30 +9,53 @@ interface ProjectPayload {
 // Action Types
 export const CREATE_PROJECT = 'CREATE_PROJECT';
 export const GET_PROJECTS = 'GET_PROJECTS';
+export const FIND_PROJECT = 'FIND_PROJECT';
+export const UPDATE_PROJECT = 'UPDATE_PROJECT';
+export const DELETE_PROJECT = 'DELETE_PROJECT';
   
 // Action Interfaces
-export interface CreateProjectAction {
+interface CreateProjectAction {
     type: typeof CREATE_PROJECT;
-    payload: ProjectPayload;
+    payload: Project;
 }
 
-export interface GetProjectsAction {
+interface GetProjectsAction {
     type: typeof GET_PROJECTS;
     payload: Project[];
+}
+
+interface FindProjectAction {
+    type: typeof FIND_PROJECT;
+    payload: Project;
+}
+
+interface UpdateProjectAction {
+    type: typeof UPDATE_PROJECT;
+    payload: Project;
+}
+
+interface DeleteProjectAction {
+    type: typeof DELETE_PROJECT;
+    payload: number;
 }
 
 // Action Type Union
 export type ProjectActionTypes = 
     | CreateProjectAction
-    | GetProjectsAction;
+    | GetProjectsAction
+    | FindProjectAction
+    | UpdateProjectAction
+    | DeleteProjectAction;
   
 // Modal Props Interface
-interface CreateProjectModalProps {
+interface ProjectModalProps {
     isOpen: boolean;
     error?: string | null;
     isLoading: boolean;
     onClose: () => void;
     onSubmit: (data: ProjectPayload) => void;
+    projectToEdit?: Project | null;
+    isEditMode?: boolean;
 }
 
 // Modal Types
@@ -46,4 +69,4 @@ type Project = {
 }
   
 // Export types and interfaces
-export type { ProjectPayload, CreateProjectModalProps, Project };
+export type { ProjectPayload, ProjectModalProps, Project };

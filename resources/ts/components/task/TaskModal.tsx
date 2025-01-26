@@ -1,42 +1,49 @@
 import { useState, useEffect } from 'react';
-import { CreateTaskModalProps, TaskPayload } from '../features/task/taskTypes';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { format } from 'date-fns';
+import { TaskModalProps, TaskPayload } from '../../features/task/taskTypes';
+import { getUsers } from '../../features/user/userActions';
+import { getProjects } from '../../features/project/projectActions';
+import { AppDispatch, RootState } from '../../store';
 
-const CreateTaskModal = ({ isOpen, isLoading, error, onClose, onSubmit }: CreateTaskModalProps) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('pending');
-  const [priority, setPriority] = useState('pending');
-  const [dueDate, setDueDate] = useState('');
-  const [assignedTo, setAssignedTo] = useState('');
-  const [projectId, setProjectId] = useState('');
-  const [users, setUsers] = useState<any[]>([]);
-  const [projects, setProjects] = useState<any[]>([]);
+const TaskModal = ({
+  isOpen,
+  isLoading,
+  error,
+  onClose,
+  onSubmit,
+  taskToEdit,
+  isEditMode = false,
+}: TaskModalProps) => {
+  const dispatch = useDispatch<AppDispatch>();
 
-  // Fetch users and projects when the modal opens
+  const [name, setName] = useState(taskToEdit?.name || '');
+  const [description, setDescription] = useState(taskToEdit?.description || '');
+  const [status, setStatus] = useState(taskToEdit?.status || 'pending');
+  const [priority, setPriority] = useState(taskToEdit?.priority || 'low');
+  const [dueDate, setDueDate] = useState(taskToEdit?.due_date ? format(new Date(taskToEdit.due_date), 'yyyy-MM-dd') : '');
+  const [assignedTo, setAssignedTo] = useState(taskToEdit?.assigned_to || '');
+  const [projectId, setProjectId] = useState(taskToEdit?.project_id || '');
+
+  const users = useSelector((state: RootState) => state.user.users);
+  const projects = useSelector((state: RootState) => state.project.projects);
+
   useEffect(() => {
     if (isOpen) {
-      axios.get('/api/users')
-        .then(response => setUsers(response.data))
-        .catch(err => console.error('Failed to fetch users:', err));
-
-      axios.get('/api/projects')
-        .then(response => setProjects(response.data))
-        .catch(err => console.error('Failed to fetch projects:', err));
+      dispatch(getUsers);
+      dispatch(getProjects);
     }
-  }, [isOpen]);
+  }, [isOpen, dispatch]);
 
   useEffect(() => {
-    if (error) {
-      setName('');
-      setDescription('');
-      setStatus('pending');
-      setPriority('low');
-      setDueDate('');
-      setAssignedTo('');
-      setProjectId('');
-    }
-  }, [error]);
+    setName(taskToEdit?.name || '');
+    setDescription(taskToEdit?.description || '');
+    setStatus(taskToEdit?.status || 'pending');
+    setPriority(taskToEdit?.priority || 'low');
+    setDueDate(taskToEdit?.due_date ? format(new Date(taskToEdit.due_date), 'yyyy-MM-dd') : '');
+    setAssignedTo(taskToEdit?.assigned_to || '');
+    setProjectId(taskToEdit?.project_id || '');
+  }, [error, taskToEdit]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -58,13 +65,31 @@ const CreateTaskModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Create
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg w-full sm:w-96 text-gray-600 text-sm block">
-        <h2 className="text-xl font-semibold border-b-2 border-gray-400 px-6 py-4">Create New Task</h2>
-        <div className="px-6 py-4">
+      <div className="bg-white rounded-lg w-full sm:w-96 md:w-1/2 lg:w-1/3 text-gray-600 text-sm block max-h-[90vh] overflow-y-auto">
+        <h2 className="text-xl font-semibold border-b-2 border-gray-400 px-4 py-2">
+          { isEditMode ? 'Update Task' : 'Create Task' }
+        </h2>
+        <div className="px-4 py-2">
 
           {error && <div className="text-red-500 mb-4">{error}</div>}
 
           <form onSubmit={handleSubmit}>
+            <div className="mb-5">
+              <label htmlFor="projectId" className="font-medium">Project</label>
+              <select
+                id="projectId"
+                className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
+                value={projectId}
+                onChange={(e) => setProjectId(e.target.value)}
+                required
+              >
+                <option value="">Select Project</option>
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>{project.name}</option>
+                ))}
+              </select>
+            </div>
+
             <div className="mb-5">
               <label htmlFor="name" className="font-medium">Task Name</label>
               <input
@@ -142,23 +167,7 @@ const CreateTaskModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Create
               >
                 <option value="">Select User</option>
                 {users.map((user) => (
-                  <option key={user.id} value={user.id}>{ user.name }</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mb-5">
-              <label htmlFor="projectId" className="font-medium">Project</label>
-              <select
-                id="projectId"
-                className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
-                value={projectId}
-                onChange={(e) => setProjectId(e.target.value)}
-                required
-              >
-                <option value="">Select Project</option>
-                {projects.map((project) => (
-                  <option key={project.id} value={ project.id }>{ project.name }</option>
+                  <option key={user.id} value={user.id}>{user.name}</option>
                 ))}
               </select>
             </div>
@@ -176,7 +185,7 @@ const CreateTaskModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Create
                 disabled={isLoading}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-400"
               >
-                { isLoading ? 'Creating...' : 'Create Task' }
+                { isLoading ? 'Saving...' : isEditMode ? 'Update Task' : 'Create Task' }
               </button>
             </div>
           </form>
@@ -186,4 +195,4 @@ const CreateTaskModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Create
   );
 };
 
-export default CreateTaskModal;
+export default TaskModal;

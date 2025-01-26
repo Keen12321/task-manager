@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
-import { AppDispatch, RootState } from '../store';
-import { login, logout } from '../features/user/userActions';
-import LoginModal from './LoginModal';
-import { LoginPayload } from '../features/user/userTypes';
+import { AppDispatch, RootState } from '../../store';
+import { login, logout } from '../../features/user/userActions';
+import LoginModal from './modals/LoginModal';
+import { LoginPayload } from '../../features/user/userTypes';
 
 const Navigation = () => {
   const dispatch = useDispatch<AppDispatch>();

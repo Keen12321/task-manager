@@ -1,6 +1,3 @@
-import { Project } from "../project/projectTypes";
-import { User } from "../user/userTypes";
-
 // Payload Interface
 interface TaskPayload {
     name: string;
@@ -15,37 +12,60 @@ interface TaskPayload {
 // Action Types
 export const CREATE_TASK = 'CREATE_TASK';
 export const GET_TASKS = 'GET_TASKS';
+export const FIND_TASK = 'FIND_TASK';
 export const GET_USER_TASKS = 'GET_USER_TASKS';
+export const UPDATE_TASK = 'UPDATE_TASK';
+export const DELETE_TASK = 'DELETE_TASK';
   
 // Action Interfaces
-export interface CreateTaskAction {
+interface CreateTaskAction {
     type: typeof CREATE_TASK;
-    payload: TaskPayload;
+    payload: Task;
 }
 
-export interface GetTasksAction {
+interface GetTasksAction {
     type: typeof GET_TASKS;
     payload: Task[];
 }
 
-export interface GetUserTasksAction {
+interface FindTaskAction {
+    type: typeof FIND_TASK;
+    payload: Task;
+}
+
+interface GetUserTasksAction {
     type: typeof GET_USER_TASKS;
     payload: Task[];
+}
+
+interface UpdateTaskAction {
+    type: typeof UPDATE_TASK;
+    payload: Task;
+}
+
+interface DeleteTaskAction {
+    type: typeof DELETE_TASK;
+    payload: number;
 }
 
 // Action Type Union
 export type TaskActionTypes = 
     | CreateTaskAction
     | GetTasksAction
-    | GetUserTasksAction;
+    | FindTaskAction
+    | GetUserTasksAction
+    | UpdateTaskAction
+    | DeleteTaskAction;
   
 // Modal Props Interface
-interface CreateTaskModalProps {
+interface TaskModalProps {
     isOpen: boolean;
-    error?: string | null;
     isLoading: boolean;
+    error: string | null;
     onClose: () => void;
-    onSubmit: (data: TaskPayload) => void;
+    onSubmit: (taskData: TaskPayload) => void;
+    taskToEdit?: Task | null;
+    isEditMode?: boolean;
 }
 
 // Modal Types
@@ -57,9 +77,9 @@ type Task = {
     priority: string;
     due_date: Date;
     created_at: Date;
-    assigned_to: User;
-    project_id: Project;
+    assigned_to: string;
+    project_id: string;
 }
   
 // Export types and interfaces
-export type { TaskPayload, CreateTaskModalProps, Task };
+export type { TaskPayload, TaskModalProps, Task };

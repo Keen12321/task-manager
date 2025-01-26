@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
-import CreateUserModal from "../components/CreateUserModal";
-import PageHeader from "../components/PageHeader";
+import UserModal from "../components/user/UserModal";
+import PageHeader from "../components/common/PageHeader";
+import Table from '../components/common/Table';
 import { createUser, getUsers } from '../features/user/userActions';
 import { User, UserPayload } from '../features/user/userTypes';
 import { AppDispatch, RootState } from '../store';
-import Table from '../components/Table';
 
 const Users = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -60,7 +60,7 @@ const Users = () => {
         title="Users"
         emitAddNew={openModal}
       />
-      <CreateUserModal
+      <UserModal
         isOpen={isModalOpen}
         isLoading={isLoading} 
         error={error}

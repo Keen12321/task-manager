@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CreateUserModalProps, UserPayload } from '../features/user/userTypes';
+import { CreateUserModalProps, UserPayload } from '../../features/user/userTypes';
 
 const CreateUserModal = ({ isOpen, isLoading, error, onClose, onSubmit }: CreateUserModalProps) => {
   const [name, setName] = useState('');

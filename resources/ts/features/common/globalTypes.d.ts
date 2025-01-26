@@ -30,6 +30,20 @@ declare global {
     title: string;
     emitAddNew?: () => void;
   }
+  
+  type TaskManagementProps = {
+    title: string;
+    fetchTasks: () => void;
+    tasksSelector: (state: RootState) => Task[];
+  };
+
+  interface DeleteConfirmationDialogProps {
+    isOpen: boolean;
+    dialogHeader: string;
+    dialogText?: string
+    onCancel: () => void;
+    onConfirm: () => void;
+  }
 }
 
 

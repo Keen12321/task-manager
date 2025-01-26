@@ -1,20 +1,27 @@
 import { useState, useEffect } from 'react';
-import { CreateProjectModalProps, ProjectPayload } from '../features/project/projectTypes';
+import { format } from 'date-fns';
+import { ProjectModalProps, ProjectPayload } from '../../features/project/projectTypes';
 
-const CreateProjectModal = ({ isOpen, isLoading, error, onClose, onSubmit }: CreateProjectModalProps) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [status, setStatus] = useState('pending');
+const ProjectModal = ({
+  isOpen,
+  isLoading,
+  error,
+  onClose,
+  onSubmit,
+  projectToEdit,
+  isEditMode,
+}: ProjectModalProps) => {
+  const [name, setName] = useState(projectToEdit?.name || '');
+  const [description, setDescription] = useState(projectToEdit?.description || '');
+  const [dueDate, setDueDate] = useState(projectToEdit?.due_date ? format(new Date(projectToEdit.due_date), 'yyyy-MM-dd') : '');
+  const [status, setStatus] = useState(projectToEdit?.status || 'pending');
 
   useEffect(() => {
-    if (error) {
-      setName(name);
-      setDescription(description);
-      setDueDate(dueDate);
-      setStatus(status);
-    }
-  }, [error]);
+    setName(projectToEdit?.name || '');
+    setDescription(projectToEdit?.description || '');
+    setDueDate(projectToEdit?.due_date ? format(new Date(projectToEdit.due_date), 'yyyy-MM-dd') : '');
+    setStatus(projectToEdit?.status || 'pending');
+  }, [error, projectToEdit]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -33,8 +40,10 @@ const CreateProjectModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Cre
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg w-full sm:w-96 text-gray-600 text-sm block">
-        <h2 className="text-xl font-semibold border-b-2 border-gray-400 px-6 py-4">Create New Project</h2>
+      <div className="bg-white rounded-lg w-full sm:w-96 md:w-1/2 lg:w-1/3 text-gray-600 text-sm block">
+        <h2 className="text-xl font-semibold border-b-2 border-gray-400 px-6 py-4">
+          { isEditMode ? 'Update Project' : 'Create Project' }
+        </h2>
         <div className="px-6 py-4">
 
           {error && <div className="text-red-500 mb-4">{ error }</div>}
@@ -104,7 +113,7 @@ const CreateProjectModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Cre
                 disabled={isLoading}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-400"
               >
-                { isLoading ? 'Creating...' : 'Create User' }
+                { isLoading ? 'Saving...' : isEditMode ? 'Update Project' : 'Create Project' }
               </button>
             </div>
           </form>
@@ -114,4 +123,4 @@ const CreateProjectModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Cre
   );
 };
 
-export default CreateProjectModal;
+export default ProjectModal;

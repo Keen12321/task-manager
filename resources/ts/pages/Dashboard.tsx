@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
-import PageHeader from "../components/PageHeader";
-import Table from "../components/Table";
-import TaskCard from "../components/TaskCard";
+import PageHeader from "../components/common/PageHeader";
+import Table from "../components/common/Table";
+import TaskCard from "../components/dashboard/TaskCard";
 import { getUserTasks } from '../features/task/taskActions';
-import { Task as TaskType } from '../features/task/taskTypes';
+import { Task } from '../features/task/taskTypes';
 import { AppDispatch, RootState } from '../store';
 
 const Dashboard = () => {
@@ -20,7 +20,7 @@ const Dashboard = () => {
     { name: 'CREATE DATE', key: 'created_at' },
   ];
   const userTasks = useSelector((state: RootState) => state.task.userTasks);
-  const transformedTasks = (userTasks as TaskType[]).map((task: TaskType) => ({
+  const transformedTasks = (userTasks as Task[]).map((task: Task) => ({
     id: task.id,
     name: task.name,
     description: task.description,
