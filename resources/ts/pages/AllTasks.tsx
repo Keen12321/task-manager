@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
-import CreateProjectModal from "../components/CreateProjectModal";
+import CreateTaskModal from "../components/CreateTaskModal";
 import PageHeader from "../components/PageHeader";
-import { createProject, getProjects } from '../features/project/projectActions';
-import { Project as ProjectType, ProjectPayload } from '../features/project/projectTypes';
+import { createTask, getTasks } from '../features/task/taskActions';
+import { Task as TaskType, TaskPayload } from '../features/task/taskTypes';
 import { AppDispatch, RootState } from '../store';
 import Table from "../components/Table";
 
-const Project = () => {
+const AllTasks = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,26 +23,26 @@ const Project = () => {
     { name: 'DUE DATE', key: 'due_date' },
     { name: 'CREATE DATE', key: 'created_at' },
   ];
-  const projects = useSelector((state: RootState) => state.project.projects);
-  const transformedProjects = (projects as ProjectType[]).map((project: ProjectType) => ({
-    id: project.id,
-    name: project.name,
-    description: project.description,
-    status: project.status,
-    due_date: format(project.due_date, 'M-dd-yyyy'),
-    created_at: format(project.created_at, 'M-dd-yyyy'),
+  const tasks = useSelector((state: RootState) => state.task.tasks);
+  const transformedTasks = (tasks as TaskType[]).map((task: TaskType) => ({
+    id: task.id,
+    name: task.name,
+    description: task.description,
+    status: task.status,
+    due_date: format(task.due_date, 'M-dd-yyyy'),
+    created_at: format(task.created_at, 'M-dd-yyyy'),
   }));
 
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const handleCreateProject = async (projectData: ProjectPayload) => {
+  const handleCreateTask = async (taskData: TaskPayload) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      await dispatch(createProject(projectData));
+      await dispatch(createTask(taskData));
       setIsLoading(false);
       closeModal();
     } catch (err) {
@@ -56,27 +56,27 @@ const Project = () => {
   };
 
   useEffect(() => {
-    dispatch(getProjects);
+    dispatch(getTasks);
   }, [dispatch]);
 
   return (
     <div>
       <PageHeader
-        title="Projects"
+        title="Tasks"
         emitAddNew={openModal}
       />
-      <CreateProjectModal
+      <CreateTaskModal
         isOpen={isModalOpen}
         isLoading={isLoading} 
         error={error}
         onClose={closeModal}
-        onSubmit={handleCreateProject}
+        onSubmit={handleCreateTask}
       />
       <div className="lg:max-w-[75%] mx-auto py-4">
-        <Table headers={headers} rows={transformedProjects} />
+        <Table headers={headers} rows={transformedTasks} />
       </div>
     </div>
   )
 }
 
-export default Project;
+export default AllTasks;

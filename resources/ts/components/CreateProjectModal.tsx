@@ -4,15 +4,15 @@ import { CreateProjectModalProps, ProjectPayload } from '../features/project/pro
 const CreateProjectModal = ({ isOpen, isLoading, error, onClose, onSubmit }: CreateProjectModalProps) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('pending');
   const [dueDate, setDueDate] = useState('');
+  const [status, setStatus] = useState('pending');
 
   useEffect(() => {
     if (error) {
       setName(name);
       setDescription(description);
-      setStatus(status);
       setDueDate(dueDate);
+      setStatus(status);
     }
   }, [error]);
 
@@ -22,8 +22,8 @@ const CreateProjectModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Cre
     const projectData: ProjectPayload = {
       name,
       description,
-      status,
       due_date: new Date(dueDate),
+      status,
     };
     
     onSubmit(projectData);
@@ -65,6 +65,18 @@ const CreateProjectModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Cre
             </div>
 
             <div className="mb-5">
+              <label htmlFor="dueDate" className="font-medium">Due Date</label>
+              <input
+                id="dueDate"
+                type="date"
+                className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="mb-5">
               <label htmlFor="status" className="font-medium">Status</label>
               <select
                 id="status"
@@ -77,18 +89,6 @@ const CreateProjectModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Cre
                 <option value="in_progress">In Progress</option>
                 <option value="completed">Completed</option>
               </select>
-            </div>
-
-            <div className="mb-5">
-              <label htmlFor="dueDate" className="font-medium">Due Date</label>
-              <input
-                id="dueDate"
-                type="date"
-                className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                required
-              />
             </div>
 
             <div className="flex justify-between py-2">

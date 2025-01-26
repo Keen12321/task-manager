@@ -26,7 +26,7 @@ const Users = () => {
     id: user.id,
     name: user.name,
     email: user.email,
-    created_at: format(user.created_at, 'MM-dd-yyyy'),
+    created_at: format(user.created_at, 'M-dd-yyyy'),
   }));
 
   const openModal = () => setIsModalOpen(true);

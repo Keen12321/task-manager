@@ -11,7 +11,7 @@ export const CREATE_PROJECT = 'CREATE_PROJECT';
 export const GET_PROJECTS = 'GET_PROJECTS';
   
 // Action Interfaces
-export interface CreateUserAction {
+export interface CreateProjectAction {
     type: typeof CREATE_PROJECT;
     payload: ProjectPayload;
 }
@@ -23,7 +23,7 @@ export interface GetProjectsAction {
 
 // Action Type Union
 export type ProjectActionTypes = 
-    | CreateUserAction
+    | CreateProjectAction
     | GetProjectsAction;
   
 // Modal Props Interface
@@ -40,8 +40,8 @@ type Project = {
     id: number,
     name: string;
     description: string;
-    status: string;
     due_date: Date;
+    status: string;
     created_at: Date;
 }
   

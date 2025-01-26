@@ -1,39 +1,37 @@
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { format } from 'date-fns';
 import PageHeader from "../components/PageHeader";
 import Table from "../components/Table";
 import TaskCard from "../components/TaskCard";
+import { getUserTasks } from '../features/task/taskActions';
+import { Task as TaskType } from '../features/task/taskTypes';
+import { AppDispatch, RootState } from '../store';
 
 const Dashboard = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const headers: TableHeader[] = [
     { name: 'ID', key: 'id' },
-    { name: 'PROJECT NAME', key: 'title' },
-    { name: 'NAME', key: 'description' },
+    { name: 'NAME', key: 'name' },
+    { name: 'DESCRIPTION', key: 'description' },
     { name: 'STATUS', key: 'status' },
-    { name: 'DUE DATE', key: 'date' },
+    { name: 'DUE DATE', key: 'due_date' },
+    { name: 'CREATE DATE', key: 'created_at' },
   ];
+  const userTasks = useSelector((state: RootState) => state.task.userTasks);
+  const transformedTasks = (userTasks as TaskType[]).map((task: TaskType) => ({
+    id: task.id,
+    name: task.name,
+    description: task.description,
+    status: task.status,
+    due_date: format(task.due_date, 'M-dd-yyyy'),
+    created_at: format(task.created_at, 'M-dd-yyyy'),
+  }));
 
-  const rows: TableRow[] =  [ 
-    { 
-      id: 4,
-      title: 'Voluptatem dicta magnam dolores omnis',
-      description: 'Autem iste vero qui sit ipsum ipsum omnis voluptatem.',
-      status: 'Pending',
-      date: '2024-02-20' 
-    },
-    {
-      id: 6,
-      title: 'Voluptatem dicta magnam dolores omnis',
-      description: 'Sed nihil deleniti minima occaecati dignissimos commodi omnis.',
-      status: 'In Progress',
-      date: '2024-06-02'
-    },
-    {
-      id: 9,
-      title: 'Voluptatem dicta magnam dolores omnis',
-      description: 'Aut ut sed sint earum nihil.',
-      status: 'Pending',
-      date: '2024-12-20'
-    }
-  ];
+  useEffect(() => {
+    getUserTasks(dispatch); 
+  }, [dispatch]);
 
   return (
     <div>
@@ -63,7 +61,7 @@ const Dashboard = () => {
         </div>
         <div className="w-full p-6 bg-gray-800">
           <h2 className="text-xl mb-4">My Active Tasks</h2>
-          <Table headers={headers} rows={rows} />
+          <Table headers={headers} rows={transformedTasks} />
         </div>
       </div>
     </div>

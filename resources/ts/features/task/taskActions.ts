@@ -1,0 +1,49 @@
+import axios, { AxiosError } from 'axios';
+import { Dispatch } from 'redux';
+import { toast } from 'react-toastify'; 
+import { CREATE_TASK, GET_TASKS, GET_USER_TASKS, TaskPayload } from './taskTypes';
+
+export const createTask = (taskData: TaskPayload) => async (dispatch: Dispatch) => {
+  try {
+    const response = await axios.post('/api/create-task', taskData);
+
+    dispatch({
+      type: CREATE_TASK,
+      payload: response.data,
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError<Record<string, string[]>>;
+  
+    const errorMessage = axiosError.response?.data.errors
+      ? Object.values(axiosError.response.data.errors).flat().join(', ')
+      : 'An error occurred while creating the task';
+  
+    throw new Error(errorMessage);
+  }
+};
+  
+export const getTasks = async (dispatch: Dispatch) => {
+  try {
+    const response = await axios.get('/api/tasks');
+      
+    dispatch({
+      type: GET_TASKS,
+      payload: response.data,
+    })
+  } catch (error) {
+    toast.error('There was an error getting tasks.')
+  }
+}
+
+export const getUserTasks = async (dispatch: Dispatch) => {
+  try {
+    const response = await axios.get('/api/user-tasks');
+      
+    dispatch({
+      type: GET_USER_TASKS,
+      payload: response.data,
+    })
+  } catch (error) {
+    toast.error('There was an error getting tasks.')
+  }
+}

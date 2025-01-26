@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class ProjectController extends Controller
 {
@@ -19,8 +20,8 @@ class ProjectController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
-            'status' => 'required|in:pending,in_progress,completed',
             'due_date' => 'nullable|date|after_or_equal:today',
+            'status' => 'required|in:pending,in_progress,completed',
         ]);
 
         if ($validator->fails()) {
@@ -31,8 +32,8 @@ class ProjectController extends Controller
             'name' => $request->name,
             'created_by' => $request->user()->id,
             'description' => $request->description,
+            'due_date' => Carbon::parse($request->due_date)->toDateString(),
             'status' => $request->status,
-            'due_date' => $request->due_date,
         ]);
 
         return response()->json($project);
