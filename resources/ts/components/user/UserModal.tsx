@@ -53,7 +53,13 @@ const CreateUserModal = () => {
     }
   };
 
-  const closeModal = () => dispatch(setUserModalVisibility(false));
+  const closeModal = () => {
+    dispatch(setUserModalVisibility(false))
+    setName('');
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+  };
 
   if (!isUserModalVisible) return null;
 
