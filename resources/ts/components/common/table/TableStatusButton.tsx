@@ -2,16 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { findProject, updateProject } from '@/features/project/projectActions';
 import { findTask, updateTask } from '@/features/task/taskActions';
-import { AppDispatch, RootState } from '@/store';
 import { TableStatusButtonProps } from '@/features/common/table/tableTypes';
+import { AppDispatch, RootState } from '@/store';
 
-const TableStatusButton = ({
-  row,
-  dataType,
-}: TableStatusButtonProps) => {
+const TableStatusButton = ({ row, dataType }: TableStatusButtonProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [selectedStatus, setSelectedStatus] = useState<number | null>(null);
   const [statusDropdownPosition, setStatusDropdownPosition] = useState({ top: 0, left: 0 });
   const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
 
@@ -19,24 +15,18 @@ const TableStatusButton = ({
   const projectToEdit = useSelector((state: RootState) => state.project.selectedProject);
 
   const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const statusColors = {
+  // Status colors and options
+  const statusColors: Record<string, string> = {
     pending: 'bg-yellow',
     in_progress: 'bg-blue',
     completed: 'bg-green',
   };
-
   const statusOptions = ['pending', 'in_progress', 'completed'];
 
-  const formatStatus = (status: string) => {
-    return status
-      .replace('_', ' ') // Replace first underscore with a space
-      .replace(/\b\w/g, char => char.toUpperCase()); // Capitalize the first letter of each word
-  };
-
+  const formatStatus = (status: string) => status.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase());
   
-  // Function to load the task or project data
+  // Load task or project data based on type
   const loadItem = () => {
     if (dataType === 'task') {
       dispatch(findTask(row.id));
@@ -45,43 +35,32 @@ const TableStatusButton = ({
     }
   };
     
-  // Function to display dropdown directly under
+  // Toggle dropdown visibility and position
   const handleButtonClick = () => {
     if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
+      const { top, left, width } = buttonRef.current.getBoundingClientRect();
       setStatusDropdownPosition({
-        top: rect.bottom,
-        left: rect.left + window.scrollX + buttonRef.current.offsetWidth / 2,
+        top: top + 40,
+        left: left + window.scrollX + width / 2,
       });
     }
-  
-    setSelectedStatus(row.id);
+
     loadItem();
     setIsDropdownVisible(!isDropdownVisible);
   };
 
-  // Function to update status for task or project
+  // Update status for task or project
   const handleStatusChange = (newStatus: string) => {
-    let updatedItem;
-    
-    if (dataType === 'task' && taskToEdit?.id) {
-      updatedItem = { ...taskToEdit, status: newStatus };
-      dispatch(updateTask(updatedItem.id, updatedItem));
-    } else if (dataType === 'project' && projectToEdit?.id) {
-      updatedItem = { ...projectToEdit, status: newStatus };
-      dispatch(updateProject(updatedItem.id, updatedItem));
+    const updatedItem = dataType === 'task' ? taskToEdit : projectToEdit;
+    if (updatedItem?.id) {
+      const updatedItemData = { ...updatedItem, status: newStatus };
+      dispatch(dataType === 'task' ? updateTask(updatedItem.id, updatedItemData) : updateProject(updatedItem.id, updatedItemData));
     }
 
-    setSelectedStatus(null);
     setIsDropdownVisible(false);
   };
 
-  // Close dropdown when mouse leaves button
-  const handleMouseLeave = () => {
-    setIsDropdownVisible(false);
-  };
-
-  // Close dropdown on scroll
+  // Close dropdown on scroll or mouse leave
   useEffect(() => {
     const handleScroll = () => {
       if (isDropdownVisible) {
@@ -95,7 +74,7 @@ const TableStatusButton = ({
   }, [isDropdownVisible]);
 
   return (
-    <div className="relative text-center" onMouseLeave={handleMouseLeave}>
+    <div className="relative text-center" onMouseLeave={() => setIsDropdownVisible(false)}>
       <button
         ref={buttonRef}
         className={`px-4 py-2 rounded-full ${statusColors[row.status as keyof typeof statusColors]} text-white text-center focus:outline-none`}
@@ -104,14 +83,10 @@ const TableStatusButton = ({
         { formatStatus(row.status) }
       </button>
 
-      {selectedStatus === row.id && isDropdownVisible && (
+      {isDropdownVisible && (
         <div
-          ref={dropdownRef}
           className="fixed flex flex-col text-white p-2 pt-0 bg-gray-100 border-2 border-t-0 border-gray-300 rounded shadow-md z-10 max-w-xs sm:max-w-full"
-          style={{
-            top: `${statusDropdownPosition.top}px`,
-            left: `${statusDropdownPosition.left}px`,
-            transform: 'translateX(-50%)',
+          style={{ top: `${statusDropdownPosition.top}px`, left: `${statusDropdownPosition.left}px`, transform: 'translateX(-50%)',
           }}
         >
           {statusOptions.map((status) => (

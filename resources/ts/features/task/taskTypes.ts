@@ -3,10 +3,10 @@ interface TaskPayload {
     name: string;
     description: string;
     status: string;
-    priority: string;
     due_date: Date;
-    assigned_to: number | string;
-    project_id: number | string;
+    priority?: string;
+    assigned_to?: number | string;
+    project_id?: number | string;
     assigned?: {
         id: number;
         name: string

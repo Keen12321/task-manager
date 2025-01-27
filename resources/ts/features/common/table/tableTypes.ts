@@ -28,7 +28,6 @@ export type TableActionTypes =
     | setFileterAction;
 
 // Modal Props Interface
-
 type DataTypes = 'task' | 'project' | 'user'
 
 interface TableProps<RowData> {

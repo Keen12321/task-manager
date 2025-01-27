@@ -15,24 +15,36 @@ const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [transformedUsers, setTransformedUsers] = useState<any[]>([]);;
 
+  const users = useSelector((state: RootState) => state.user.users);
+
+  // Transform the users when the users array changes
+  useEffect(() => {
+    if (users) {
+      const updatedUsers = (users as User[]).map((user: User) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        created_at: format(user.created_at, 'M-dd-yyyy'),
+      }));
+      setTransformedUsers(updatedUsers);
+    }
+  }, [users]);
+  
+  // Table headers
   const headers: TableHeader[] = [
     { name: 'ID', key: 'id' },
     { name: 'NAME', key: 'name', width: 25 },
     { name: 'EMAIL', key: 'email' },
     { name: 'CREATED', key: 'created_at' },
   ];
-  const users = useSelector((state: RootState) => state.user.users);
-  const transformedUsers = (users as User[]).map((user: User) => ({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    created_at: format(user.created_at, 'M-dd-yyyy'),
-  }));
 
+  // Open the user modal for create
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
+  // Handle user creation
   const handleCreateUser = async (userData: UserPayload) => {
     setIsLoading(true);
     setError(null);
@@ -43,24 +55,18 @@ const Users = () => {
       closeModal();
     } catch (err) {
       setIsLoading(false);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred. Please try again.');
-      }
+      setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
     }
   };
 
+  // Fetch users on component mount
   useEffect(() => {
     dispatch(getUsers);
   }, [dispatch]);
 
   return (
     <div>
-      <PageHeader
-        title="Users"
-        emitAddNew={openModal}
-      />
+      <PageHeader title="Users" emitAddNew={openModal} />
       <UserModal
         isOpen={isModalOpen}
         isLoading={isLoading} 

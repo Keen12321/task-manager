@@ -15,9 +15,7 @@ const TableFilters = ({ headers, dataType }: TableFiltersProps) => {
     dispatch(setFilter({ key, value }));
   };
 
-  const formatHeader = (name: string) => {
-    return name.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-  }
+  const formatHeader = (name: string) => name.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
 
   const resetFilters = () => {
     if (filters?.dataType !== dataType) {
@@ -29,7 +27,6 @@ const TableFilters = ({ headers, dataType }: TableFiltersProps) => {
     }
   };
   
-  // Reset filters when page changes (detect route changes)
   useEffect(() => {
     resetFilters();
   }, [location, dispatch, dataType]);

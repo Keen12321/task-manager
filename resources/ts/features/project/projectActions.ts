@@ -17,7 +17,7 @@ export const createProject = (projectData: ProjectPayload) => async (dispatch: D
     const axiosError = error as AxiosError<Record<string, string[]>>;
   
     const errorMessage = axiosError.response?.data.errors
-      ? Object.values(axiosError.response.data.errors).flat().join(', ')
+      ? Object.values(axiosError.response.data.errors).flat().join('\n')
       : 'An error occurred while creating the project';
   
     throw new Error(errorMessage);
@@ -64,10 +64,10 @@ export const updateProject = (id: number, projectData: ProjectPayload) => async 
     const axiosError = error as AxiosError<Record<string, string[]>>;
 
     const errorMessage = axiosError.response?.data.errors
-      ? Object.values(axiosError.response.data.errors).flat().join(', ')
+      ? Object.values(axiosError.response.data.errors).flat().join('\n')
       : 'An error occurred while updating the project';
 
-    toast.error(errorMessage);
+    throw new Error(errorMessage);
   }
 };
 

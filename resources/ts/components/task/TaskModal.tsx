@@ -5,6 +5,7 @@ import { TaskModalProps, TaskPayload } from '../../features/task/taskTypes';
 import { getUsers } from '../../features/user/userActions';
 import { getProjects } from '../../features/project/projectActions';
 import { AppDispatch, RootState } from '../../store';
+import Error from '../common/Error';
 
 const TaskModal = ({
   isOpen,
@@ -70,8 +71,7 @@ const TaskModal = ({
           { isEditMode ? 'Update Task' : 'Create Task' }
         </h2>
         <div className="px-4 py-2">
-
-          {error && <div className="text-red-500 mb-4">{error}</div>}
+          { <Error errorMessage={error} /> }
 
           <form onSubmit={handleSubmit}>
             <div className="mb-5">

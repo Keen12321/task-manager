@@ -1,17 +1,24 @@
+import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TableStatusButton from './TableStatusButton';
 import TableActions from './TableActions';
+import TableFilters from './TableFilters';
 import { setSort } from '@/features/common/table/tableActions';
 import { TableProps } from '@/features/common/table/tableTypes';
 import { RootState } from '@/store';
-import TableFilters from './TableFilters';
 
-const Table = <RowData extends { id: number; [key: string]: React.ReactNode }>(props: TableProps<RowData>) => {
+const Table = <RowData extends { id: number; [key: string]: React.ReactNode }>({
+  headers,
+  rows,
+  dataType,
+  onUpdate,
+  onDelete,
+}: TableProps<RowData>) => {
   const dispatch = useDispatch();
 
-  const { headers, rows, dataType, onUpdate, onDelete } = props;
   const { sort, filters } = useSelector((state: RootState) => state.table);
 
+  // Utility to render cell content based on header key
   const renderCell = (row: RowData, headerKey: string) => {
     let value = row[headerKey as keyof RowData];
 
@@ -30,34 +37,28 @@ const Table = <RowData extends { id: number; [key: string]: React.ReactNode }>(p
     return value ?? '';
   };
 
+  // Handle table sort
   const handleSort = (key: string) => {
     const direction = sort.key === key && sort.direction === 'asc' ? 'desc' : 'asc';
     dispatch(setSort({ key, direction }));
   };
 
-  // Apply sorting and filtering logic
-  const sortedRows = [...rows].sort((a, b) => {
-    const sortValueA = a[sort.key as keyof RowData] ?? '';
-    const sortValueB = b[sort.key as keyof RowData] ?? '';
-
-    if (sort.direction === 'asc') {
-      return sortValueA < sortValueB ? -1 : 1;
-    } else {
-      return sortValueA > sortValueB ? -1 : 1;
-    }
-  });
-
-  const filteredRows = sortedRows.filter((row) => {
-    return Object.keys(filters).every((filterKey) => {
-      const filterValue = filters[filterKey as keyof typeof filters];
-      const rowValue = row[filterKey as keyof RowData];
-      const rowStringValue = rowValue ? rowValue.toString().toLowerCase() : '';
-
-      return rowStringValue.includes((filterValue ?? '').toLowerCase());
+  // Apply sorting and filtering logic with useMemo for optimization
+  const filteredRows = useMemo(() => {
+    const sortedRows = [...rows].sort((a, b) => {
+      const valueA = a[sort.key as keyof RowData] ?? '';
+      const valueB = b[sort.key as keyof RowData] ?? '';
+      return sort.direction === 'asc' ? (valueA < valueB ? -1 : 1) : (valueA > valueB ? -1 : 1);
     });
-  });
 
-  console.log(filteredRows)
+    return sortedRows.filter((row) => 
+      Object.keys(filters).every((filterKey) => {
+        const filterValue = filters[filterKey]?.toLowerCase() ?? '';
+        const rowValue = String(row[filterKey as keyof RowData] ?? '').toLowerCase();
+        return rowValue.includes(filterValue);
+      })
+    );
+  }, [rows, filters, sort]);
 
   return (
     <div className="shadow-lg rounded-lg overflow-x-auto">
@@ -68,27 +69,32 @@ const Table = <RowData extends { id: number; [key: string]: React.ReactNode }>(p
       <table className="min-w-full table-auto hidden sm:table border border-gray-600">
         <thead className="bg-gray-800 text-white text-left">
           <tr>
-            {headers.map((header, index) => (
-              <th
-                key={index}
-                className="px-6 py-3 cursor-pointer"
-                style={{ width: header.width + '%' || 'auto' }}
-                onClick={() => handleSort(header.key)}
-              >
-                <div className={`flex items-center ${header.key === 'status' ? 'justify-center' : ''}`}>
-                  <span className='mr-2'>{ header.name }</span>
-                  {sort.key === header.key ? (
-                    sort.direction === 'asc' ? (
-                      <span style={{ display: 'block' }}>🔽</span>
+            {headers.map((header, index) => {
+              if (header.key === 'actions') {
+                return (
+                  <th key={index} className="px-6 py-3"></th>
+                );
+              } 
+
+              return (
+                <th
+                  key={index}
+                  className="px-6 py-3 cursor-pointer"
+                  style={{ width: header.width + '%' || 'auto' }}
+                  onClick={() => handleSort(header.key)}
+                >
+                  <div className={`flex items-center ${header.key === 'status' ? 'justify-center' : ''}`}>
+                    <span className='mr-2'>{ header.name }</span>
+                    {sort.key === header.key ? (
+                      sort.direction === 'asc' ? (<span style={{ display: 'block' }}>🔽</span>)
+                        : (<span style={{ display: 'block' }}>🔼</span>)
                     ) : (
-                      <span style={{ display: 'block' }}>🔼</span>
-                    )
-                  ) : (
-                    <span>🔼</span>
-                  )}
-                </div>
-              </th>
-            ))}
+                      <span>🔼</span>
+                    )}
+                  </div>
+                </th>
+              )
+            })}
           </tr>
         </thead>
 

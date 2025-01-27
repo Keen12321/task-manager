@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LoginModalProps, LoginPayload } from '@/features/user/userTypes';
+import Error from '../Error';
 
 const LoginModal = ({ isOpen, isLoading, error, onClose, onSubmit }: LoginModalProps) => {
   const [email, setEmail] = useState('');
@@ -30,8 +31,8 @@ const LoginModal = ({ isOpen, isLoading, error, onClose, onSubmit }: LoginModalP
       <div className="bg-white rounded-lg w-full sm:w-96 text-gray-600 text-sm block">
         <h2 className="text-xl font-semibold border-b-2 border-gray-400 px-6 py-4">Login</h2>
         <div className="px-6 py-4">
+          { error && <Error errorMessage={error} /> }
 
-          {error && <div className="text-red-500 mb-4">{ error }</div>}
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label htmlFor="email" className="font-medium">Email</label>

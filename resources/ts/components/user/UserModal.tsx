@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CreateUserModalProps, UserPayload } from '../../features/user/userTypes';
+import Error from '../common/Error';
 
 const CreateUserModal = ({ isOpen, isLoading, error, onClose, onSubmit }: CreateUserModalProps) => {
   const [name, setName] = useState('');
@@ -41,8 +42,7 @@ const CreateUserModal = ({ isOpen, isLoading, error, onClose, onSubmit }: Create
       <div className="bg-white rounded-lg w-full sm:w-96 text-gray-600 text-sm block">
         <h2 className="text-xl font-semibold border-b-2 border-gray-400 px-6 py-4">Create New User</h2>
         <div className="px-6 py-4">
-
-          {error && <div className="text-red-500 mb-4">{ error }</div>}
+          { <Error errorMessage={error} /> }
 
           <form onSubmit={handleSubmit}>
             <div className="mb-5">

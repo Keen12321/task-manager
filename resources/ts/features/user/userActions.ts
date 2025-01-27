@@ -68,7 +68,7 @@ export const createUser = (userData: UserPayload) => async (dispatch: Dispatch) 
     const axiosError = error as AxiosError<Record<string, string[]>>;
 
     const errorMessage = axiosError.response?.data.errors
-      ? Object.values(axiosError.response.data.errors).flat().join(', ')
+      ? Object.values(axiosError.response.data.errors).flat().join('\n')
       : 'An error occurred while creating the user';
 
     throw new Error(errorMessage);

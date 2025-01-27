@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import ProjectModal from "../components/project/ProjectModal";
@@ -21,25 +21,31 @@ const Projects = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null); 
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
 
+  const projects = useSelector((state: RootState) => state.project.projects);
+  const projectToEdit = useSelector((state: RootState) => state.project.selectedProject);
+  
+  // Table headers
   const headers: TableHeader[] = [
     { name: 'ID', key: 'id' },
-    { name: 'NAME', key: 'name', width: 40 },
+    { name: 'NAME', key: 'header_name', width: 40 },
     { name: 'STATUS', key: 'status'},
     { name: 'DUE DATE', key: 'due_date' },
     { name: 'CREATED', key: 'created_at' },
     { name: '', key: 'actions' },
   ];
-  const projects = useSelector((state: RootState) => state.project.projects);
-  const projectToEdit = useSelector((state: RootState) => state.project.selectedProject);
-  const transformedProjects = (projects as Project[]).map((project: Project) => ({
-    id: project.id,
-    name: project.name,
-    description: project.description,
-    status: project.status,
-    due_date: format(project.due_date, 'M-dd-yyyy'),
-    created_at: format(project.created_at, 'M-dd-yyyy'),
-  }));
 
+  // Transform projects for the table
+  const transformedProjects = useMemo(() => 
+    projects.map((project: Project) => ({
+      id: project.id,
+      header_name: project.name,
+      status: project.status,
+      due_date: format(project.due_date, 'M-dd-yyyy'),
+      created_at: format(project.created_at, 'M-dd-yyyy'),
+    })), [projects]
+  );
+
+  // Open the project modal for edit or create
   const openModal = (id: number | null = null) => {
     if (id) {
       dispatch(findProject(id)); 
@@ -50,20 +56,25 @@ const Projects = () => {
     setIsModalOpen(true);
   };
   
+  // Close the project modal
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedProject(null);
     setIsEditMode(false);
   };
 
+  // Open the delete confirmation dialog
   const openDeleteDialog =  (id: number) => {
     setDeleteItemId(id);
     setIsDialogOpen(true);
   };
+
+  // Close the delete confirmation dialog
   const closeDeleteDialog = () => {
     setIsDialogOpen(false);
   };
 
+  // Handle submit for create or update
   const handleSubmit = async (projectData: ProjectPayload) => {
     setIsLoading(true);
     setError(null);
@@ -79,14 +90,11 @@ const Projects = () => {
       closeModal();
     } catch (err) {
       setIsLoading(false);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred. Please try again.');
-      }
+      setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
     }
   };
 
+  // Handle confirm project deletion
   const handleConfirmDelete = () => {
     if (deleteItemId) {
       dispatch(deleteProject(deleteItemId));
@@ -96,6 +104,7 @@ const Projects = () => {
     setIsDialogOpen(false);
   };
 
+  // Sync selected project when projectToEdit changes
   useEffect(() => {
     if (projectToEdit) {
       setSelectedProject(projectToEdit);
@@ -103,16 +112,14 @@ const Projects = () => {
     }
   }, [projectToEdit]);
 
+  // Fetch projects on mount
   useEffect(() => {
     dispatch(getProjects);
   }, [dispatch]);
 
   return (
     <div>
-      <PageHeader
-        title="Projects"
-        emitAddNew={() => openModal()}
-      />
+      <PageHeader title="Projects" emitAddNew={() => openModal()} />
       <ProjectModal
         isOpen={isModalOpen}
         isLoading={isLoading}

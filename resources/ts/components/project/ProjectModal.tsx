@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { ProjectModalProps, ProjectPayload } from '../../features/project/projectTypes';
+import Error from '../common/Error';
 
 const ProjectModal = ({
   isOpen,
@@ -46,7 +47,7 @@ const ProjectModal = ({
         </h2>
         <div className="px-6 py-4">
 
-          {error && <div className="text-red-500 mb-4">{ error }</div>}
+          { <Error errorMessage={error} /> }
 
           <form onSubmit={handleSubmit}>
             <div className="mb-5">

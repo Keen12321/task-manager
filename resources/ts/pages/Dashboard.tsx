@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import PageHeader from "../components/common/PageHeader";
@@ -12,60 +12,47 @@ import { TableHeader } from '@/features/common/table/tableTypes';
 const Dashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [filteredUserTasks, setFilteredUserTasks] = useState({
-    pending: 0,
-    inProgress: 0,
-    completed: 0,
-  })
-  const [filteredTotalTasks, setFilteredTotalTasks] = useState({
-    pending: 0,
-    inProgress: 0,
-    completed: 0,
-  })
+  const userTasks = useSelector((state: RootState) => state.task.userTasks);
+  const totalTasks = useSelector((state: RootState) => state.task.tasks);
 
+  // Table headers
   const headers: TableHeader[] = [
     { name: 'ID', key: 'id' },
-    { name: 'PROJECT NAME', key: 'project', width: 25 },
+    { name: 'PROJECT NAME', key: 'project_name', width: 25 },
     { name: 'NAME', key: 'name', width: 30 },
     { name: 'STATUS', key: 'status'},
     { name: 'DUE DATE', key: 'due_date' },
   ];
-
-  const userTasks = useSelector((state: RootState) => state.task.userTasks);
-  const totalTasks = useSelector((state: RootState) => state.task.tasks);
   
-  const transformedTasks = (userTasks as Task[]).map((task: Task) => ({
-    id: task.id,
-    project: task.project.name,
-    name: task.name,
-    status: task.status,
-    due_date: format(task.due_date, 'M-dd-yyyy'),
-  }));
+  // Transform tasks for the table
+  const transformedTasks = useMemo(() =>
+    userTasks.map((task: Task) => ({
+      id: task.id,
+      project_name: task.project.name,
+      name: task.name,
+      status: task.status,
+      due_date: format(task.due_date, 'M-dd-yyyy'),
+    })), [userTasks]
+  );
+  
+  // Calculate task status counts
+  const calculateStatusCounts = (tasks: Task[]) => {
+    return tasks.reduce(
+      (counts, task) => {
+        if (task.status === 'pending') counts.pending += 1;
+        if (task.status === 'in_progress') counts.inProgress += 1;
+        if (task.status === 'completed') counts.completed += 1;
+        return counts;
+      },
+      { pending: 0, inProgress: 0, completed: 0 }
+    );
+  }
+  
+  // Calculate task counts
+  const filteredUserTasks = useMemo(() => calculateStatusCounts(userTasks), [userTasks]);
+  const filteredTotalTasks = useMemo(() => calculateStatusCounts(totalTasks), [totalTasks]);
 
-  useEffect(() => {
-    const statusCounts = { pending: 0, inProgress: 0, completed: 0 };
-
-    userTasks.forEach((task: Task) => {
-      if (task.status === 'pending') statusCounts.pending += 1;
-      if (task.status === 'in_progress') statusCounts.inProgress += 1;
-      if (task.status === 'completed') statusCounts.completed += 1;
-    });
-
-    setFilteredUserTasks(statusCounts);
-  }, [userTasks]);
-
-  useEffect(() => {
-    const statusCounts = { pending: 0, inProgress: 0, completed: 0 };
-
-    totalTasks.forEach((task: Task) => {
-      if (task.status === 'pending') statusCounts.pending += 1;
-      if (task.status === 'in_progress') statusCounts.inProgress += 1;
-      if (task.status === 'completed') statusCounts.completed += 1;
-    });
-
-    setFilteredTotalTasks(statusCounts);
-  }, [totalTasks]);
-
+  // Fetch tasks on mount
   useEffect(() => {
     getTasks(dispatch);
     getUserTasks(dispatch); 
@@ -73,33 +60,22 @@ const Dashboard = () => {
 
   return (
     <div>
-      <PageHeader
-        title="Dashboard"
-      />
+      <PageHeader title="Dashboard" />
       <div className="lg:max-w-[75%] mx-auto">
         <div className="flex flex-col lg:flex-row justify-between w-full py-4">
-          <TaskCard
-            title="Pending Tasks"
-            titleColor="text-yellow"
-            userTasks={filteredUserTasks.pending}
-            totalTasks={filteredTotalTasks.pending}
-          />
-          <TaskCard
-            title="In Progress Tasks"
-            titleColor="text-blue"
-            userTasks={filteredUserTasks.inProgress}
-            totalTasks={filteredTotalTasks.inProgress}
-          />
-          <TaskCard
-            title="Completed Tasks"
-            titleColor="text-green"
-            userTasks={filteredUserTasks.completed}
-            totalTasks={filteredTotalTasks.completed}
-          />
+          {['Pending', 'In Progress', 'Completed'].map((status, index) => (
+            <TaskCard
+              key={status}
+              title={`${status} Tasks`}
+              titleColor={index === 0 ? 'text-yellow' : index === 1 ? 'text-blue' : 'text-green'}
+              userTasks={filteredUserTasks[status.toLowerCase().replace(' ', '') as keyof typeof filteredUserTasks] || 0}
+              totalTasks={filteredTotalTasks[status.toLowerCase().replace(' ', '') as keyof typeof filteredTotalTasks] || 0}
+            />
+          ))}
         </div>
         <div className="w-full p-6 bg-gray-800">
           <h2 className="text-xl mb-4">My Active Tasks</h2>
-          <Table headers={headers} rows={transformedTasks} dataType="task"/>
+          <Table headers={headers} rows={transformedTasks} dataType="task" />
         </div>
       </div>
     </div>

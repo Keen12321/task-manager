@@ -17,7 +17,7 @@ export const createTask = (taskData: TaskPayload) => async (dispatch: Dispatch) 
     const axiosError = error as AxiosError<Record<string, string[]>>;
   
     const errorMessage = axiosError.response?.data.errors
-      ? Object.values(axiosError.response.data.errors).flat().join(', ')
+      ? Object.values(axiosError.response.data.errors).flat().join('\n')
       : 'An error occurred while creating the task';
   
     throw new Error(errorMessage);
@@ -77,10 +77,10 @@ export const updateTask = (id: number, taskData: TaskPayload) => async (dispatch
     const axiosError = error as AxiosError<Record<string, string[]>>;
 
     const errorMessage = axiosError.response?.data.errors
-      ? Object.values(axiosError.response.data.errors).flat().join(', ')
+      ? Object.values(axiosError.response.data.errors).flat().join('\n')
       : 'An error occurred while updating the task';
 
-    toast.error(errorMessage);
+    throw new Error(errorMessage);
   }
 };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import LoginModal from './modals/LoginModal';
@@ -8,29 +8,26 @@ import { AppDispatch, RootState } from '@/store';
 
 const Navigation = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const location = useLocation();
-
-  useEffect(() => {
-    const path = location.pathname.split('/')[1];
-    setActiveTab(path);
-  }, [location.pathname]); 
 
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
 
-  const tabs = [
+  const tabs = useMemo(() => [
     { name: 'Dashboard', key: '', link: '/' },
     { name: 'Projects', key: 'projects', link: '/projects' },
     { name: 'All Tasks', key: 'all-tasks', link: '/all-tasks' },
     { name: 'Users', key: 'users', link: '/users' },
-    { name: 'My Tasks', key: 'my-tasks', link: '/my-tasks' }
-  ];
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    { name: 'My Tasks', key: 'my-tasks', link: '/my-tasks' },
+  ], []);
+
+  const activeTab = location.pathname.split('/')[1];
+
+  const toggleMenu = () => setIsMenuOpen(prev => !prev);
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
@@ -44,17 +41,11 @@ const Navigation = () => {
       closeLoginModal();
     } catch (err) {
       setIsLoading(false);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred. Please try again.');
-      }
+      setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
     }
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-  };
+  const handleLogout = () => dispatch(logout());
 
   return (
     <div className="bg-darkBlue text-white border-b-2 border-gray-500">
@@ -117,7 +108,6 @@ const Navigation = () => {
             className={`cursor-pointer py-2 px-4 text-lg font-medium block w-full lg:w-auto text-center lg:text-left ${
               activeTab === tab.key ? 'border-b-2 border-blue' : ''
             }`}
-            onClick={() => setActiveTab(tab.key)}
           >
             { tab.name }
           </Link>
