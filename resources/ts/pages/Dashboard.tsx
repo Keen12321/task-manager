@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import PageHeader from "../components/common/PageHeader";
-import Table from "../components/common/Table";
+import Table from "../components/common/table/Table";
 import TaskCard from "../components/dashboard/TaskCard";
 import { getTasks, getUserTasks } from '../features/task/taskActions';
 import { Task } from '../features/task/taskTypes';
 import { AppDispatch, RootState } from '../store';
+import { TableHeader } from '@/features/common/table/tableTypes';
 
 const Dashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,11 +24,11 @@ const Dashboard = () => {
   })
 
   const headers: TableHeader[] = [
-    { name: 'ID', key: 'id', width: 5 },
-    { name: 'PROJECT NAME', key: 'project', width: 15 },
-    { name: 'NAME', key: 'name', width: 35 },
-    { name: 'STATUS', key: 'status', width: 20 },
-    { name: 'DUE DATE', key: 'due_date', width: 10 },
+    { name: 'ID', key: 'id' },
+    { name: 'PROJECT NAME', key: 'project', width: 25 },
+    { name: 'NAME', key: 'name', width: 30 },
+    { name: 'STATUS', key: 'status'},
+    { name: 'DUE DATE', key: 'due_date' },
   ];
 
   const userTasks = useSelector((state: RootState) => state.task.userTasks);

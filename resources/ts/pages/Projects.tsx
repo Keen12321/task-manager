@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import ProjectModal from "../components/project/ProjectModal";
 import PageHeader from "../components/common/PageHeader";
-import Table from "../components/common/Table";
+import Table from "../components/common/table/Table";
 import DeleteConfirmationDialog from '../components/common/modals/DeleteConfirmationDialog';
 import { createProject, deleteProject, findProject, getProjects, updateProject } from '../features/project/projectActions';
 import { Project, ProjectPayload } from '../features/project/projectTypes';
 import { AppDispatch, RootState } from '../store';
+import { TableHeader } from '@/features/common/table/tableTypes';
 
 const Projects = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,9 +24,9 @@ const Projects = () => {
   const headers: TableHeader[] = [
     { name: 'ID', key: 'id' },
     { name: 'NAME', key: 'name', width: 40 },
-    { name: 'STATUS', key: 'status' },
+    { name: 'STATUS', key: 'status'},
     { name: 'DUE DATE', key: 'due_date' },
-    { name: 'CREATE DATE', key: 'created_at' },
+    { name: 'CREATED', key: 'created_at' },
     { name: '', key: 'actions' },
   ];
   const projects = useSelector((state: RootState) => state.project.projects);

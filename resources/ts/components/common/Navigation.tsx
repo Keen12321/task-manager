@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
-import { AppDispatch, RootState } from '../../store';
-import { login, logout } from '../../features/user/userActions';
 import LoginModal from './modals/LoginModal';
-import { LoginPayload } from '../../features/user/userTypes';
+import { login, logout } from '@/features/user/userActions';
+import { LoginPayload } from '@/features/user/userTypes';
+import { AppDispatch, RootState } from '@/store';
 
 const Navigation = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -64,9 +64,8 @@ const Navigation = () => {
         </button>
 
         <div className="flex items-center justify-end lg:justify-between w-full">
-          <div
-            className="hidden lg:flex flex-row w-full mt-4 lg:mt-0"
-          >
+          {/* Desktop Menu */}
+          <div className="hidden lg:flex flex-row w-full mt-4 lg:mt-0">
             {tabs.map(tab => (
               <Link
                 key={tab.key}
@@ -79,6 +78,8 @@ const Navigation = () => {
               </Link>
             ))}
           </div>
+
+          {/* User Dropdown */}
           <div className="relative group">
             <button
               className="flex bg-transparent text-white border border-white rounded-full py-2 px-4"
@@ -107,9 +108,8 @@ const Navigation = () => {
         </div>
       </div>
 
-      <div
-        className={`flex lg:flex-row flex-col w-full mt-4 ${isMenuOpen ? 'flex' : 'hidden'}`}
-      >
+      {/* Mobile Menu Links */}
+      <div className={`flex lg:hidden lg:flex-row flex-col w-full mt-4 ${isMenuOpen ? 'flex' : 'hidden'}`}>
         {tabs.map(tab => (
           <Link
             key={tab.key}

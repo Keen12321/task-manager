@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { findProject, updateProject } from '@/features/project/projectActions';
 import { findTask, updateTask } from '@/features/task/taskActions';
 import { AppDispatch, RootState } from '@/store';
+import { TableStatusButtonProps } from '@/features/common/table/tableTypes';
 
 const TableStatusButton = ({
   row,
@@ -12,6 +13,7 @@ const TableStatusButton = ({
 
   const [selectedStatus, setSelectedStatus] = useState<number | null>(null);
   const [statusDropdownPosition, setStatusDropdownPosition] = useState({ top: 0, left: 0 });
+  const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
 
   const taskToEdit = useSelector((state: RootState) => state.task.selectedTask);
   const projectToEdit = useSelector((state: RootState) => state.project.selectedProject);
@@ -43,18 +45,19 @@ const TableStatusButton = ({
     }
   };
     
-  // Function to display dropdown directly under status
+  // Function to display dropdown directly under
   const handleButtonClick = () => {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setStatusDropdownPosition({
-        top: rect.bottom + window.scrollY,
-        left: rect.left + window.scrollX,
+        top: rect.bottom,
+        left: rect.left + window.scrollX + buttonRef.current.offsetWidth / 2,
       });
     }
   
     setSelectedStatus(row.id);
     loadItem();
+    setIsDropdownVisible(!isDropdownVisible);
   };
 
   // Function to update status for task or project
@@ -70,29 +73,29 @@ const TableStatusButton = ({
     }
 
     setSelectedStatus(null);
+    setIsDropdownVisible(false);
   };
 
+  // Close dropdown when mouse leaves button
+  const handleMouseLeave = () => {
+    setIsDropdownVisible(false);
+  };
 
-  // Close dropdown when clicking outside
+  // Close dropdown on scroll
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
-        buttonRef.current && !buttonRef.current.contains(event.target as Node)
-      ) {
-        setSelectedStatus(null);
+    const handleScroll = () => {
+      if (isDropdownVisible) {
+        setIsDropdownVisible(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('scroll', handleScroll);
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isDropdownVisible]);
 
   return (
-    <div className="relative text-center">
+    <div className="relative text-center" onMouseLeave={handleMouseLeave}>
       <button
         ref={buttonRef}
         className={`px-4 py-2 rounded-full ${statusColors[row.status as keyof typeof statusColors]} text-white text-center focus:outline-none`}
@@ -101,13 +104,13 @@ const TableStatusButton = ({
         { formatStatus(row.status) }
       </button>
 
-      {selectedStatus === row.id && (
+      {selectedStatus === row.id && isDropdownVisible && (
         <div
           ref={dropdownRef}
           className="fixed flex flex-col text-white p-2 pt-0 bg-gray-100 border-2 border-t-0 border-gray-300 rounded shadow-md z-10 max-w-xs sm:max-w-full"
           style={{
             top: `${statusDropdownPosition.top}px`,
-            left: `${statusDropdownPosition.left + (buttonRef.current?.offsetWidth || 0) / 2}px`,
+            left: `${statusDropdownPosition.left}px`,
             transform: 'translateX(-50%)',
           }}
         >

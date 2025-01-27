@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LoginModalProps, LoginPayload } from '../../../features/user/userTypes';
+import { LoginModalProps, LoginPayload } from '@/features/user/userTypes';
 
 const LoginModal = ({ isOpen, isLoading, error, onClose, onSubmit }: LoginModalProps) => {
   const [email, setEmail] = useState('');

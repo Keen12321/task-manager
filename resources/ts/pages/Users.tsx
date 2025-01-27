@@ -3,10 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import UserModal from "../components/user/UserModal";
 import PageHeader from "../components/common/PageHeader";
-import Table from '../components/common/Table';
+import Table from '../components/common/table/Table';
 import { createUser, getUsers } from '../features/user/userActions';
 import { User, UserPayload } from '../features/user/userTypes';
 import { AppDispatch, RootState } from '../store';
+import { TableHeader } from '@/features/common/table/tableTypes';
 
 const Users = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -17,9 +18,9 @@ const Users = () => {
 
   const headers: TableHeader[] = [
     { name: 'ID', key: 'id' },
-    { name: 'NAME', key: 'name' },
+    { name: 'NAME', key: 'name', width: 25 },
     { name: 'EMAIL', key: 'email' },
-    { name: 'CREATE DATE', key: 'created_at' },
+    { name: 'CREATED', key: 'created_at' },
   ];
   const users = useSelector((state: RootState) => state.user.users);
   const transformedUsers = (users as User[]).map((user: User) => ({
@@ -68,7 +69,7 @@ const Users = () => {
         onSubmit={handleCreateUser}
       />
       <div className="lg:max-w-[75%] mx-auto py-4">
-        <Table headers={headers} rows={transformedUsers} />
+        <Table headers={headers} rows={transformedUsers} dataType="user" />
       </div>
     </div>
   )

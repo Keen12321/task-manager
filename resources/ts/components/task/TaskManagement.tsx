@@ -3,11 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { format } from "date-fns";
 import DeleteConfirmationDialog from "../common/modals/DeleteConfirmationDialog";
 import PageHeader from "../common/PageHeader";
-import Table from "../common/Table";
+import Table from "../common/table/Table";
 import TaskModal from "./TaskModal";
 import { createTask, deleteTask, findTask, updateTask } from "../../features/task/taskActions";
 import { Task, TaskPayload } from "../../features/task/taskTypes";
 import { AppDispatch, RootState } from "../../store";
+import { TableHeader } from "@/features/common/table/tableTypes";
   
 const TaskManagementPage = ({
   title,
@@ -24,12 +25,12 @@ const TaskManagementPage = ({
   const [selectedTask, setSelectedTask] = useState<Task | null>(null); 
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
 
-  const headers = [
-    { name: 'ID', key: 'id', width: 5 },
-    { name: 'PROJECT NAME', key: 'project', width: 15 },
-    { name: 'NAME', key: 'name', width: 35 },
-    { name: 'STATUS', key: 'status', width: 20 },
-    { name: 'DUE DATE', key: 'due_date', width: 10 },
+  const headers: TableHeader[] = [
+    { name: 'ID', key: 'id'},
+    { name: 'PROJECT NAME', key: 'project', width: 25 },
+    { name: 'NAME', key: 'name', width: 30 },
+    { name: 'STATUS', key: 'status'},
+    { name: 'DUE DATE', key: 'due_date' },
   ]
   
   const tasks = useSelector(tasksSelector);
