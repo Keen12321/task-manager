@@ -12,8 +12,6 @@
 .env.production
 .phpactor.json
 .phpunit.result.cache
-composer.lock
-package-lock.json
 tsconfig.tsbuildinfo
 Homestead.json
 Homestead.yaml
