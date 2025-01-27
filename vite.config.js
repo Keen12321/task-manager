@@ -27,10 +27,9 @@ export default defineConfig({
     outDir: path.resolve(__dirname, 'public/build'),
     manifest: "manifest.json",
     emptyOutDir: true,
+    publicPath: process.env.APP_URL || '/',
   },
   server: {
-    hmr: {
-      host: 'localhost',
-    },
+    https: true,
   },
 });
