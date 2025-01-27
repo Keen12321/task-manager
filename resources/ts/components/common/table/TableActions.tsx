@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-import { TableActionsProps } from '@/features/common/table/tableTypes';
+import { TableActionsProps } from '@/features/table/tableTypes';
 
 const TableActions = ({ onUpdate, onDelete }: TableActionsProps) => {
   return (

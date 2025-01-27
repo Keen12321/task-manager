@@ -1,9 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
-import LoginModal from './modals/LoginModal';
-import { login, logout } from '@/features/user/userActions';
-import { LoginPayload } from '@/features/user/userTypes';
+import { setLoginModalVisibility, logout } from '@/features/auth/authActions';
 import { AppDispatch, RootState } from '@/store';
 
 const Navigation = () => {
@@ -11,11 +9,8 @@ const Navigation = () => {
   const location = useLocation();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const currentUser = useSelector((state: RootState) => state.user.currentUser);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const tabs = useMemo(() => [
     { name: 'Dashboard', key: '', link: '/' },
@@ -28,22 +23,7 @@ const Navigation = () => {
   const activeTab = location.pathname.split('/')[1];
 
   const toggleMenu = () => setIsMenuOpen(prev => !prev);
-  const openLoginModal = () => setIsLoginModalOpen(true);
-  const closeLoginModal = () => setIsLoginModalOpen(false);
-
-  const handleLogin = async (loginData: LoginPayload) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      await dispatch(login(loginData));
-      setIsLoading(false);
-      closeLoginModal();
-    } catch (err) {
-      setIsLoading(false);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
-    }
-  };
+  const openLoginModal = () => dispatch(setLoginModalVisibility(true));
 
   const handleLogout = () => dispatch(logout());
 
@@ -75,19 +55,19 @@ const Navigation = () => {
             <button
               className="flex bg-transparent text-white border border-white rounded-full py-2 px-4"
             >
-              <span className="flex-shrink-0">{ currentUser && 'name' in currentUser ? currentUser.name : 'Guest' }</span>
+              <span className="flex-shrink-0">{ user && 'name' in user ? user.name : 'Guest' }</span>
               <span className="ml-4">&#9660;</span>
             </button>
-            {currentUser && (
+            {user && (
               <div className="absolute top-[30px] right-0 bg-white text-black rounded-lg shadow-lg mt-2 group-hover:block hidden">
                 <ul>
-                  <li className="py-2 px-4 cursor-pointer rounded-lg hover:bg-gray-300">Profile</li>
+                  {/* <li className="py-2 px-4 cursor-pointer rounded-lg hover:bg-gray-300">Profile</li> */}
                   <li className="py-2 px-4 cursor-pointer rounded-lg hover:bg-gray-300" onClick={handleLogout}>Logout</li>
                 </ul>
               </div>
             )}
 
-            {!currentUser && (
+            {!user && (
               <div className="absolute top-[30px] right-0 bg-white text-black rounded-lg shadow-lg mt-2 group-hover:block hidden">
                 <ul>
                   <li className="py-2 px-4 cursor-pointer rounded-lg hover:bg-gray-300" onClick={openLoginModal}>Login</li>
@@ -113,17 +93,7 @@ const Navigation = () => {
           </Link>
         ))}
       </div>
-
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        isLoading={isLoading}
-        onClose={closeLoginModal}
-        error={error}
-        onSubmit={handleLogin}
-      />
     </div>
-
-
   );
 };
 

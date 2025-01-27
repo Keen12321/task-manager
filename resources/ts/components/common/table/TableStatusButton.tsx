@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { findProject, updateProject } from '@/features/project/projectActions';
 import { findTask, updateTask } from '@/features/task/taskActions';
-import { TableStatusButtonProps } from '@/features/common/table/tableTypes';
+import { TableStatusButtonProps } from '@/features/table/tableTypes';
 import { AppDispatch, RootState } from '@/store';
 
 const TableStatusButton = ({ row, dataType }: TableStatusButtonProps) => {
@@ -77,7 +77,7 @@ const TableStatusButton = ({ row, dataType }: TableStatusButtonProps) => {
     <div className="relative text-center" onMouseLeave={() => setIsDropdownVisible(false)}>
       <button
         ref={buttonRef}
-        className={`px-4 py-2 rounded-full ${statusColors[row.status as keyof typeof statusColors]} text-white text-center focus:outline-none`}
+        className={`px-4 py-2 rounded-full ${ statusColors[row.status as keyof typeof statusColors] } text-white inline-flex whitespace-nowrap justify-center focus:outline-none`}
         onClick={handleButtonClick}
       >
         { formatStatus(row.status) }
@@ -86,7 +86,7 @@ const TableStatusButton = ({ row, dataType }: TableStatusButtonProps) => {
       {isDropdownVisible && (
         <div
           className="fixed flex flex-col text-white p-2 pt-0 bg-gray-100 border-2 border-t-0 border-gray-300 rounded shadow-md z-10 max-w-xs sm:max-w-full"
-          style={{ top: `${statusDropdownPosition.top}px`, left: `${statusDropdownPosition.left}px`, transform: 'translateX(-50%)',
+          style={{ top: `${ statusDropdownPosition.top}px`, left: `${statusDropdownPosition.left }px`, transform: 'translateX(-50%)',
           }}
         >
           {statusOptions.map((status) => (
@@ -94,8 +94,8 @@ const TableStatusButton = ({ row, dataType }: TableStatusButtonProps) => {
               <button
                 key={status}
                 onClick={() => handleStatusChange(status)}
-                className={`block px-4 py-2 mt-2 rounded-full text-center flex-grow
-                    ${status === 'pending' ? 'bg-yellow' : status === 'in_progress' ? 'bg-blue' : 'bg-green'}`}
+                className={`px-4 py-2 mt-2 rounded-full inline-flex whitespace-nowrap justify-center
+                    ${ status === 'pending' ? 'bg-yellow' : status === 'in_progress' ? 'bg-blue' : 'bg-green' }`}
               >
                 { formatStatus(status) }
               </button>

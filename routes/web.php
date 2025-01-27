@@ -11,6 +11,10 @@ Route::get('/projects', function () {
     return view('app');
 });
 
+Route::get('/project/{id}', function () {
+    return view('app');
+});
+
 Route::get('/all-tasks', function () {
     return view('app');
 });

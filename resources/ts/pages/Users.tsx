@@ -1,20 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
-import UserModal from "../components/user/UserModal";
-import PageHeader from "../components/common/PageHeader";
-import Table from '../components/common/table/Table';
-import { createUser, getUsers } from '../features/user/userActions';
-import { User, UserPayload } from '../features/user/userTypes';
-import { AppDispatch, RootState } from '../store';
-import { TableHeader } from '@/features/common/table/tableTypes';
+import PageHeader from "@/components/common/PageHeader";
+import Table from '@/components/common/table/Table';
+import { getUsers, setUserModalVisibility } from '@/features/user/userActions';
+import { User } from '@/features/user/userTypes';
+import { TableHeader } from '@/features/table/tableTypes';
+import { AppDispatch, RootState } from '@/store';
 
 const Users = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [transformedUsers, setTransformedUsers] = useState<any[]>([]);;
 
   const users = useSelector((state: RootState) => state.user.users);
@@ -40,40 +36,16 @@ const Users = () => {
     { name: 'CREATED', key: 'created_at' },
   ];
 
-  // Open the user modal for create
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
-  // Handle user creation
-  const handleCreateUser = async (userData: UserPayload) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      await dispatch(createUser(userData));
-      setIsLoading(false);
-      closeModal();
-    } catch (err) {
-      setIsLoading(false);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
-    }
-  };
+  const openUserModal = () => dispatch(setUserModalVisibility(true));
 
   // Fetch users on component mount
   useEffect(() => {
-    dispatch(getUsers);
+    dispatch(getUsers());
   }, [dispatch]);
 
   return (
     <div>
-      <PageHeader title="Users" emitAddNew={openModal} />
-      <UserModal
-        isOpen={isModalOpen}
-        isLoading={isLoading} 
-        error={error}
-        onClose={closeModal}
-        onSubmit={handleCreateUser}
-      />
+      <PageHeader title="Users" emitAddNew={openUserModal} />
       <div className="lg:max-w-[75%] mx-auto py-4">
         <Table headers={headers} rows={transformedUsers} dataType="user" />
       </div>

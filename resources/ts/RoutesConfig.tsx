@@ -1,9 +1,10 @@
 import { Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
 import AllTasks from './pages/AllTasks';
-import Users from './pages/Users';
 import UserTasks from './pages/UserTasks';
+import Users from './pages/Users';
 
 // import TaskDetails from './pages/TaskDetails';
 // import NotFound from './pages/NotFound';
@@ -15,9 +16,10 @@ const RoutesConfig: React.FC = () => {
       {/* Public routes */}
       <Route path="/" element={<Dashboard />} />
       <Route path="/projects" element={<Projects />} />
+      <Route path="/project/:id" element={<ProjectDetail />} />
       <Route path="/all-tasks" element={<AllTasks />} />
-      <Route path="/users" element={<Users />} />
       <Route path="/my-tasks" element={<UserTasks />} />
+      <Route path="/users" element={<Users />} />
       
       {/* Protected routes (only accessible if authenticated) */}
       {/* <Route 

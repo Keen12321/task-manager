@@ -1,9 +1,4 @@
 // Payload Interface
-interface LoginPayload {
-    email: string;
-    password: string;
-}
-
 interface UserPayload {
     name: string;
     email: string;
@@ -12,19 +7,20 @@ interface UserPayload {
 }
 
 // Action Types
-export const LOGIN_USER = 'LOGIN_USER';
-export const LOGOUT_USER = 'LOGOUT_USER';
+export const SHOW_USER_MODAL = 'SHOW_USER_MODAL';
+export const HIDE_USER_MODAL = 'HIDE_USER_MODAL';
 export const CREATE_USER = 'CREATE_USER';
 export const GET_USERS = 'GET_USERS';
   
 // Action Interfaces
-interface UserLoginAction {
-    type: typeof LOGIN_USER;
-    payload: LoginPayload;
+interface ShowUserModalAction {
+    type: typeof SHOW_USER_MODAL;
+    isUserModalVisible: true;
 }
 
-interface UserLogoutAction {
-    type: typeof LOGOUT_USER;
+interface HideUserModalAction {
+    type: typeof HIDE_USER_MODAL;
+    isUserModalVisible: false;
 }
 
 interface CreateUserAction {
@@ -38,27 +34,11 @@ interface GetUsersAction {
 }
 
 // Action Type Union
-export type UserActionTypes = UserLoginAction
-    | UserLogoutAction
+export type UserActionTypes =
+    | ShowUserModalAction
+    | HideUserModalAction
     | CreateUserAction
     | GetUsersAction;
-  
-// Modal Props Interface
-interface LoginModalProps {
-    isOpen: boolean;
-    error?: string | null;
-    isLoading: boolean;
-    onClose: () => void;
-    onSubmit: (data: LoginPayload) => void;
-}
-
-interface CreateUserModalProps {
-    isOpen: boolean;
-    error?: string | null;
-    isLoading: boolean;
-    onClose: () => void;
-    onSubmit: (data: UserPayload) => void;
-}
 
 // Modal Types
 type User = {
@@ -69,4 +49,4 @@ type User = {
 }
   
 // Export types and interfaces
-export type { LoginPayload, UserPayload, LoginModalProps, CreateUserModalProps, User };
+export type { UserPayload, User };

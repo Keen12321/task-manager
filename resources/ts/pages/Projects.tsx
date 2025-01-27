@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import ProjectModal from "../components/project/ProjectModal";
@@ -8,7 +8,7 @@ import DeleteConfirmationDialog from '../components/common/modals/DeleteConfirma
 import { createProject, deleteProject, findProject, getProjects, updateProject } from '../features/project/projectActions';
 import { Project, ProjectPayload } from '../features/project/projectTypes';
 import { AppDispatch, RootState } from '../store';
-import { TableHeader } from '@/features/common/table/tableTypes';
+import { TableHeader } from '@/features/table/tableTypes';
 
 const Projects = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -27,9 +27,9 @@ const Projects = () => {
   // Table headers
   const headers: TableHeader[] = [
     { name: 'ID', key: 'id' },
-    { name: 'NAME', key: 'header_name', width: 40 },
+    { name: 'NAME', key: 'project_name', width: 40 },
     { name: 'STATUS', key: 'status'},
-    { name: 'DUE DATE', key: 'due_date' },
+    { name: 'DUE DATE', key: 'due_date', width: 20 },
     { name: 'CREATED', key: 'created_at' },
     { name: '', key: 'actions' },
   ];
@@ -38,7 +38,8 @@ const Projects = () => {
   const transformedProjects = useMemo(() => 
     projects.map((project: Project) => ({
       id: project.id,
-      header_name: project.name,
+      project_name: project.name,
+      project_id: project.id,
       status: project.status,
       due_date: format(project.due_date, 'M-dd-yyyy'),
       created_at: format(project.created_at, 'M-dd-yyyy'),
@@ -46,22 +47,22 @@ const Projects = () => {
   );
 
   // Open the project modal for edit or create
-  const openModal = (id: number | null = null) => {
+  const handleModalToggle = useCallback((id: number | null = null) => {
+    setIsEditMode(!!id);
+    setIsModalOpen(true);
     if (id) {
       dispatch(findProject(id)); 
     } else {
       setSelectedProject(null);
     }
-    setIsEditMode(!!id);
-    setIsModalOpen(true);
-  };
+  }, [dispatch]);
   
   // Close the project modal
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setSelectedProject(null);
     setIsEditMode(false);
-  };
+  }, []);
 
   // Open the delete confirmation dialog
   const openDeleteDialog =  (id: number) => {
@@ -70,11 +71,9 @@ const Projects = () => {
   };
 
   // Close the delete confirmation dialog
-  const closeDeleteDialog = () => {
-    setIsDialogOpen(false);
-  };
+  const closeDeleteDialog = () =>setIsDialogOpen(false);
 
-  // Handle submit for create or update
+  // Handle submit for create or update project
   const handleSubmit = async (projectData: ProjectPayload) => {
     setIsLoading(true);
     setError(null);
@@ -108,18 +107,17 @@ const Projects = () => {
   useEffect(() => {
     if (projectToEdit) {
       setSelectedProject(projectToEdit);
-      console.log(selectedProject)
     }
   }, [projectToEdit]);
 
   // Fetch projects on mount
   useEffect(() => {
-    dispatch(getProjects);
+    dispatch(getProjects());
   }, [dispatch]);
 
   return (
     <div>
-      <PageHeader title="Projects" emitAddNew={() => openModal()} />
+      <PageHeader title="Projects" emitAddNew={() => handleModalToggle()} />
       <ProjectModal
         isOpen={isModalOpen}
         isLoading={isLoading}
@@ -141,7 +139,7 @@ const Projects = () => {
           headers={headers}
           rows={transformedProjects}
           dataType="project"
-          onUpdate={openModal}
+          onUpdate={handleModalToggle}
           onDelete={openDeleteDialog}
         />
       </div>

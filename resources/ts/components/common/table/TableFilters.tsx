@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { setFilter } from '@/features/common/table/tableActions';
-import { TableFiltersProps } from '@/features/common/table/tableTypes';
+import DatePicker from 'react-datepicker';
+import { setFilter } from '@/features/table/tableActions';
+import { TableFiltersProps } from '@/features/table/tableTypes';
 import { RootState } from '@/store';
-
+import 'react-datepicker/dist/react-datepicker.css';
 
 const TableFilters = ({ headers, dataType }: TableFiltersProps) => {
   const dispatch = useDispatch();
@@ -26,13 +27,20 @@ const TableFilters = ({ headers, dataType }: TableFiltersProps) => {
       }
     }
   };
+
+  // Handle DatePicker change
+  const handleDateChange = (key: string, date: Date | null) => {
+    const formattedDate = date ? date.toISOString().split('T')[0] : '';
+    dispatch(setFilter({ key, value: formattedDate }));
+  };
   
+  // Reset filters when page changes (detect route changes)
   useEffect(() => {
     resetFilters();
   }, [location, dispatch, dataType]);
 
   return (
-    <div className="flex flex-wrap mb-4 gap-4">
+    <div className="flex flex-wrap mb-4 gap-4 p-4 lg:p-0">
       {headers.map((header) => {
         if (header.key === 'actions' || header.key === 'id') return null;
 
@@ -51,6 +59,23 @@ const TableFilters = ({ headers, dataType }: TableFiltersProps) => {
                 <option value="in_progress">In Progress</option>
                 <option value="completed">Completed</option>
               </select>
+            ) : header.key === 'created_at' || header.key === 'due_date' ? (
+              <div className="flex">
+                <DatePicker
+                  selected={filters[`start_${ header.key }`] ? new Date(filters[`start_${ header.key }`]) : null}
+                  onChange={(date: Date | null) => handleDateChange(`start_${header.key}`, date)}
+                  className="border rounded p-2 w-24 mr-4"
+                  dateFormat="M-dd-yyyy"
+                  placeholderText="Select Start"
+                />
+                <DatePicker
+                  selected={filters[`end_${ header.key }`] ? new Date(filters[`end_${ header.key }`]) : null}
+                  onChange={(date: Date | null) => handleDateChange(`end_${ header.key }`, date)}
+                  className="border rounded w-24 p-2"
+                  dateFormat="M-dd-yyyy"
+                  placeholderText="Select End"
+                />
+              </div>
             ) : (
               <input
                 type="text"

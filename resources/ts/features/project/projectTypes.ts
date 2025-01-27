@@ -3,7 +3,7 @@ interface ProjectPayload {
     name: string;
     description: string;
     status: string;
-    due_date: Date;
+    due_date: Date | null;
 }
 
 // Action Types
@@ -65,7 +65,14 @@ type Project = {
     description: string;
     due_date: Date;
     status: string;
+    created_by: {
+        name: string
+    }
+    updated_by: {
+        name: string
+    }
     created_at: Date;
+    updated_at: Date;
 }
   
 // Export types and interfaces

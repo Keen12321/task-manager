@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { format } from 'date-fns';
+import DatePicker from 'react-datepicker';
 import { TaskModalProps, TaskPayload } from '../../features/task/taskTypes';
 import { getUsers } from '../../features/user/userActions';
 import { getProjects } from '../../features/project/projectActions';
 import { AppDispatch, RootState } from '../../store';
 import Error from '../common/Error';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const TaskModal = ({
   isOpen,
@@ -22,7 +23,7 @@ const TaskModal = ({
   const [description, setDescription] = useState(taskToEdit?.description || '');
   const [status, setStatus] = useState(taskToEdit?.status || 'pending');
   const [priority, setPriority] = useState(taskToEdit?.priority || 'low');
-  const [dueDate, setDueDate] = useState(taskToEdit?.due_date ? format(new Date(taskToEdit.due_date), 'yyyy-MM-dd') : '');
+  const [dueDate, setDueDate] = useState(taskToEdit?.due_date ? new Date(taskToEdit.due_date) : null);
   const [assignedTo, setAssignedTo] = useState(taskToEdit?.assigned_to || '');
   const [projectId, setProjectId] = useState(taskToEdit?.project_id || '');
 
@@ -30,21 +31,25 @@ const TaskModal = ({
   const projects = useSelector((state: RootState) => state.project.projects);
 
   useEffect(() => {
-    if (isOpen) {
-      dispatch(getUsers);
-      dispatch(getProjects);
+    if (isEditMode && taskToEdit) {
+      setName(taskToEdit.name || '');
+      setDescription(taskToEdit.description || '');
+      setStatus(taskToEdit.status || 'pending');
+      setPriority(taskToEdit.priority || 'low');
+      setDueDate(taskToEdit.due_date ? new Date(taskToEdit.due_date) : new Date());
+      setAssignedTo(taskToEdit.assigned_to || '');
+      setProjectId(taskToEdit.project_id || '');
+    } else {
+      // Reset to defaults when the modal is opened in "create" mode
+      setName('');
+      setDescription('');
+      setStatus('pending');
+      setPriority('low');
+      setDueDate(new Date());
+      setAssignedTo('');
+      setProjectId('');
     }
-  }, [isOpen, dispatch]);
-
-  useEffect(() => {
-    setName(taskToEdit?.name || '');
-    setDescription(taskToEdit?.description || '');
-    setStatus(taskToEdit?.status || 'pending');
-    setPriority(taskToEdit?.priority || 'low');
-    setDueDate(taskToEdit?.due_date ? format(new Date(taskToEdit.due_date), 'yyyy-MM-dd') : '');
-    setAssignedTo(taskToEdit?.assigned_to || '');
-    setProjectId(taskToEdit?.project_id || '');
-  }, [error, taskToEdit]);
+  }, [isEditMode, taskToEdit, isOpen]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -54,13 +59,18 @@ const TaskModal = ({
       description,
       status,
       priority,
-      due_date: new Date(dueDate),
+      due_date: dueDate,
       assigned_to: assignedTo,
       project_id: projectId,
     };
 
     onSubmit(taskData);
   };
+
+  useEffect(() => {
+    dispatch(getUsers());
+    dispatch(getProjects());
+  }, [dispatch]);
 
   if (!isOpen) return null;
 
@@ -104,9 +114,8 @@ const TaskModal = ({
 
             <div className="mb-5">
               <label htmlFor="description" className="font-medium">Task Description</label>
-              <input
+              <textarea
                 id="description"
-                type="text"
                 className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -116,14 +125,31 @@ const TaskModal = ({
 
             <div className="mb-5">
               <label htmlFor="dueDate" className="font-medium">Task Deadline</label>
-              <input
-                id="dueDate"
-                type="date"
+              <div id="dueDate">
+                <DatePicker
+                  selected={dueDate}
+                  onChange={(date: Date | null) => setDueDate(date)}
+                  className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
+                  dateFormat="M-dd-yyyy"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mb-5">
+              <label htmlFor="assignedTo" className="font-medium">Assign to</label>
+              <select
+                id="assignedTo"
                 className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
+                value={assignedTo}
+                onChange={(e) => setAssignedTo(e.target.value)}
                 required
-              />
+              >
+                <option value="">Select User</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>{user.name}</option>
+                ))}
+              </select>
             </div>
 
             <div className="mb-5">
@@ -153,22 +179,6 @@ const TaskModal = ({
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
-              </select>
-            </div>
-
-            <div className="mb-5">
-              <label htmlFor="assignedTo" className="font-medium">Assign to</label>
-              <select
-                id="assignedTo"
-                className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
-                value={assignedTo}
-                onChange={(e) => setAssignedTo(e.target.value)}
-                required
-              >
-                <option value="">Select User</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>{user.name}</option>
-                ))}
               </select>
             </div>
 

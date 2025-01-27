@@ -43,6 +43,29 @@ class TaskController extends Controller
         return response()->json($task);
     }
 
+    public function getTasksByProject($id)
+    {
+        $tasks = Task::where('project_id', $id)->with(['assignedUser', 'project'])->get();
+
+        return response()->json($tasks->map(function ($task) {
+            return [
+                'id' => $task->id,
+                'name' => $task->name,
+                'description' => $task->description,
+                'status' => $task->status,
+                'due_date' => $task->due_date,
+                'assigned_to' => [
+                    'id' => $task->assignedUser->id,
+                    'name' => $task->assignedUser->name,
+                ],
+                'project' => [
+                    'id' => $task->project->id,
+                    'name' => $task->project->name,
+                ],
+            ];
+        }));
+    }
+
     public function getTasksByUser(Request $request)
     {
         $tasks = Task::where('assigned_to', $request->user()->id)->with(['assignedUser', 'project'])->get();

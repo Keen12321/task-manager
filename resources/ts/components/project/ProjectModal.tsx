@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
 import { ProjectModalProps, ProjectPayload } from '../../features/project/projectTypes';
 import Error from '../common/Error';
+import DatePicker from 'react-datepicker';
 
 const ProjectModal = ({
   isOpen,
@@ -14,15 +14,23 @@ const ProjectModal = ({
 }: ProjectModalProps) => {
   const [name, setName] = useState(projectToEdit?.name || '');
   const [description, setDescription] = useState(projectToEdit?.description || '');
-  const [dueDate, setDueDate] = useState(projectToEdit?.due_date ? format(new Date(projectToEdit.due_date), 'yyyy-MM-dd') : '');
+  const [dueDate, setDueDate] = useState(projectToEdit?.due_date ? projectToEdit.due_date : null);
   const [status, setStatus] = useState(projectToEdit?.status || 'pending');
 
   useEffect(() => {
-    setName(projectToEdit?.name || '');
-    setDescription(projectToEdit?.description || '');
-    setDueDate(projectToEdit?.due_date ? format(new Date(projectToEdit.due_date), 'yyyy-MM-dd') : '');
-    setStatus(projectToEdit?.status || 'pending');
-  }, [error, projectToEdit]);
+    if (isEditMode && projectToEdit) {
+      setName(projectToEdit?.name || '');
+      setDescription(projectToEdit?.description || '');
+      setDueDate(projectToEdit?.due_date ? new Date(projectToEdit.due_date) : new Date());
+      setStatus(projectToEdit?.status || 'pending');
+    } else {
+      // Reset to defaults when the modal is opened in "create" mode
+      setName('');
+      setDescription('');
+      setStatus('pending');
+      setDueDate(new Date());
+    }
+  }, [isEditMode, projectToEdit, isOpen]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -30,7 +38,7 @@ const ProjectModal = ({
     const projectData: ProjectPayload = {
       name,
       description,
-      due_date: new Date(dueDate),
+      due_date: dueDate,
       status,
     };
     
@@ -63,27 +71,27 @@ const ProjectModal = ({
             </div>
 
             <div className="mb-5">
-              <label htmlFor="description" className="font-medium">Description</label>
-              <input
+              <label htmlFor="description" className="font-medium">Task Description</label>
+              <textarea
                 id="description"
-                type="text"
                 className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
               />
             </div>
-
+            
             <div className="mb-5">
-              <label htmlFor="dueDate" className="font-medium">Due Date</label>
-              <input
-                id="dueDate"
-                type="date"
-                className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                required
-              />
+              <label htmlFor="dueDate" className="font-medium">Task Deadline</label>
+              <div id="dueDate">
+                <DatePicker
+                  selected={dueDate}
+                  onChange={(date: Date | null) => setDueDate(date)}
+                  className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
+                  dateFormat="M-dd-yyyy"
+                  required
+                />
+              </div>
             </div>
 
             <div className="mb-5">

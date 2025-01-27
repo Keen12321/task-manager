@@ -1,9 +1,12 @@
+import { TableHeader } from "../table/tableTypes";
+import { LoginAction, LogoutAction } from "../auth/authTypes"
+
 // Payload Interface
 interface TaskPayload {
     name: string;
     description: string;
     status: string;
-    due_date: Date;
+    due_date: Date | null;
     priority?: string;
     assigned_to?: number | string;
     project_id?: number | string;
@@ -22,6 +25,7 @@ export const CREATE_TASK = 'CREATE_TASK';
 export const GET_TASKS = 'GET_TASKS';
 export const FIND_TASK = 'FIND_TASK';
 export const GET_USER_TASKS = 'GET_USER_TASKS';
+export const GET_PROJECT_TASKS = 'GET_PROJECT_TASKS';
 export const UPDATE_TASK = 'UPDATE_TASK';
 export const DELETE_TASK = 'DELETE_TASK';
   
@@ -46,6 +50,11 @@ interface GetUserTasksAction {
     payload: Task[];
 }
 
+interface GetProjectTasksAction {
+    type: typeof GET_PROJECT_TASKS;
+    payload: Task[];
+}
+
 interface UpdateTaskAction {
     type: typeof UPDATE_TASK;
     payload: Task;
@@ -60,10 +69,13 @@ interface DeleteTaskAction {
 export type TaskActionTypes = 
     | CreateTaskAction
     | GetTasksAction
-    | FindTaskAction
     | GetUserTasksAction
+    | GetProjectTasksAction
+    | FindTaskAction
     | UpdateTaskAction
-    | DeleteTaskAction;
+    | DeleteTaskAction
+    | LoginAction
+    | LogoutAction;
   
 // Modal Props Interface
 interface TaskModalProps {
@@ -75,6 +87,12 @@ interface TaskModalProps {
     taskToEdit?: Task | null;
     isEditMode?: boolean;
 }
+
+type TaskManagementProps = {
+    pageTitle?: string;
+    headers: TableHeader[];
+    tasks: Task[];
+};
 
 // Modal Types
 type Task = {
@@ -98,4 +116,4 @@ type Task = {
 }
   
 // Export types and interfaces
-export type { TaskPayload, TaskModalProps, Task };
+export type { TaskPayload, TaskModalProps, TaskManagementProps, Task };

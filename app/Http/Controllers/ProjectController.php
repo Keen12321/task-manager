@@ -17,7 +17,7 @@ class ProjectController extends Controller
 
     public function find($id)
     {
-        $project = Project::findOrFail($id);
+        $project = Project::with('createdBy', 'updatedBy')->findOrFail($id);
         return response()->json($project);
     }
 
@@ -45,7 +45,7 @@ class ProjectController extends Controller
         return response()->json($project);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
@@ -58,10 +58,11 @@ class ProjectController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $project = Project::findOrFail($id);
+        $project = Project::findOrFail($request->id);
 
         $project->update([
             'name' => $request->has('name') ? $request->name : $project->name,
+            'updated_by' => $request->user()->id,
             'description' => $request->has('description') ? $request->description : $project->description,
             'due_date' => $request->has('due_date') ? Carbon::parse($request->due_date)->toDateString() : $project->due_date,
             'status' => $request->has('status') ? $request->status : $project->status,

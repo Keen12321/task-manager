@@ -5,12 +5,11 @@ import DeleteConfirmationDialog from "../common/modals/DeleteConfirmationDialog"
 import PageHeader from "../common/PageHeader";
 import Table from "../common/table/Table";
 import TaskModal from "./TaskModal";
-import { createTask, deleteTask, findTask, updateTask } from "../../features/task/taskActions";
-import { Task, TaskPayload } from "../../features/task/taskTypes";
-import { AppDispatch, RootState } from "../../store";
-import { TableHeader } from "@/features/common/table/tableTypes";
+import { createTask, deleteTask, findTask, updateTask } from "@/features/task/taskActions";
+import { Task, TaskManagementProps, TaskPayload } from "@/features/task/taskTypes";
+import { AppDispatch, RootState } from "@/store";
   
-const TaskManagementPage = ({ title, fetchTasks, tasksSelector }: TaskManagementProps) => {
+const TaskTable = ({ pageTitle, headers, tasks }: TaskManagementProps) => {
   const dispatch = useDispatch<AppDispatch>();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,27 +20,19 @@ const TaskManagementPage = ({ title, fetchTasks, tasksSelector }: TaskManagement
   const [selectedTask, setSelectedTask] = useState<Task | null>(null); 
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
 
-  const tasks = useSelector(tasksSelector);
   const taskToEdit = useSelector((state: RootState) => state.task.selectedTask);
 
-  const headers: TableHeader[] = [
-    { name: 'ID', key: 'id'},
-    { name: 'PROJECT NAME', key: 'project_name' },
-    { name: 'NAME', key: 'name', width: 30 },
-    { name: 'STATUS', key: 'status', width: 15 },
-    { name: 'DUE DATE', key: 'due_date' , width: 15 },
-    { name: '', key: 'actions' }, 
-  ]
-    
   // Transform tasks for the table
   const transformedTasks = useMemo(() => tasks.map((task: Task) => ({
     id: task.id,
-    project_name: task.project.name,
+    project_name: task.project?.name || '',
+    project_id: task.project?.id || null,
     name: task.name,
     status: task.status,
     due_date: format(task.due_date, 'M-dd-yyyy'),
   })), [tasks]);
 
+  // Open the task modal for edit or create
   const handleModalToggle = useCallback((id: number | null = null) => {
     setIsEditMode(!!id);
     setIsModalOpen(true);
@@ -52,19 +43,23 @@ const TaskManagementPage = ({ title, fetchTasks, tasksSelector }: TaskManagement
     }
   }, [dispatch]);
 
+  // Close the project modal
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setSelectedTask(null);
     setIsEditMode(false);
   }, []);
 
+  // Open the delete confirmation dialog
   const openDeleteDialog = (id: number) => {
     setDeleteItemId(id);
     setIsDialogOpen(true);
   };
 
+  // Close the delete confirmation dialog
   const closeDeleteDialog = () => setIsDialogOpen(false);
 
+  // Handle submit for create or update task
   const handleSubmit = async (taskData: TaskPayload) => {
     setIsLoading(true);
     setError(null);
@@ -75,14 +70,17 @@ const TaskManagementPage = ({ title, fetchTasks, tasksSelector }: TaskManagement
       } else {
         await dispatch(createTask(taskData));
       }
+      
       setIsLoading(false);
       closeModal();
+      setSelectedTask(null);
     } catch (err) {
       setIsLoading(false);
       setError(err instanceof Error ? err.message : 'An unknown error occurred. Please try again.');
     }
   };
 
+  // Handle delete task
   const handleConfirmDelete = () => {
     if (deleteItemId) {
       dispatch(deleteTask(deleteItemId));
@@ -97,15 +95,9 @@ const TaskManagementPage = ({ title, fetchTasks, tasksSelector }: TaskManagement
     }
   }, [taskToEdit]);
 
-  // Fetch tasks on mount
-  useEffect(() => {
-    fetchTasks();
-  }, [dispatch, fetchTasks]);
-
-
   return (
     <div>
-      <PageHeader title={title} emitAddNew={() => handleModalToggle()} />
+      { pageTitle && <PageHeader title={pageTitle} emitAddNew={() => handleModalToggle()} /> }
       <TaskModal
         isOpen={isModalOpen}
         isLoading={isLoading}
@@ -122,18 +114,22 @@ const TaskManagementPage = ({ title, fetchTasks, tasksSelector }: TaskManagement
         onCancel={closeDeleteDialog}
         onConfirm={handleConfirmDelete}
       />
-      <div className="lg:max-w-[75%] mx-auto py-4">
-        <Table
-          headers={headers}
-          rows={transformedTasks}
-          dataType="task"
-          onUpdate={handleModalToggle}
-          onDelete={openDeleteDialog}
-        />
+      <div className={`${ pageTitle ? 'lg:max-w-[75%] mx-auto py-4' : '' }`}>
+        {transformedTasks.length === 0 ? (
+          <p className="p-4 lg:p-0">No tasks available.</p>
+        ) : (
+          <Table
+            headers={headers}
+            rows={transformedTasks}
+            dataType="task"
+            onUpdate={handleModalToggle}
+            onDelete={openDeleteDialog}
+          />
+        )}
       </div>
     </div>
   );
 };
   
-export default TaskManagementPage;
+export default TaskTable;
   
