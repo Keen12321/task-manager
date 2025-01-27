@@ -56,6 +56,7 @@ const LoginModal = () => {
               <input
                 id="email"
                 type="email"
+                autoComplete="username"
                 className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -67,6 +68,7 @@ const LoginModal = () => {
               <input
                 id="password"
                 type="password"
+                autoComplete="current-password"
                 className="mt-1 w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:ring-2 focus:ring-gray-400"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
