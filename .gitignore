@@ -3,6 +3,8 @@
 /public/hot
 /public/storage
 !/storage/app/public
+/storage/oauth-private.key
+/storage/oauth-public.key
 /vendor
 .rnd
 .env
