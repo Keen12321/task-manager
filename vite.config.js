@@ -5,6 +5,7 @@ import laravel from 'laravel-vite-plugin';
 import tailwindcss from 'tailwindcss';
 
 export default defineConfig({
+  base: '/',
   plugins: [
     laravel(['resources/ts/index.tsx']),
     react(),
@@ -31,5 +32,6 @@ export default defineConfig({
     hmr: {
       host: 'localhost',
     },
+    https: true,
   },
 });

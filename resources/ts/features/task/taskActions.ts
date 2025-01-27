@@ -45,7 +45,7 @@ export const getUserTasks = () => async (dispatch: AppDispatch) => {
     } else {
       const errorMessage = axiosError.response?.data.errors
         ? Object.values(axiosError.response.data.errors).flat().join('\n')
-        : 'An error occurred while updating the project';
+        : 'There was an error getting tasks.';
     
       toast.error(errorMessage);
     }
