@@ -65,7 +65,7 @@ Run the following command to install the Laravel dependencies:
     composer install
 ```
 
-## Environment Configuration
+# Environment Configuration
 Copy the .env.example file to .env
 
 ```bash
@@ -74,14 +74,14 @@ Copy the .env.example file to .env
 
 Update the .env file with your database configuration. For local development, you can use SQLite or PostgreSQL.
 
-# Generate the Application Key
+### Generate the Application Key
 Run the following command to generate the application key:
 
 ```bash
     php artisan key:generate
 ```
 
-# Run Database Migrations
+### Run Database Migrations
 If you’re using SQLite, make sure the database/database.sqlite file exists. You can create it manually or run the following command to create it and apply migrations:
 
 ```bash
@@ -90,7 +90,7 @@ If you’re using SQLite, make sure the database/database.sqlite file exists. Yo
 
 This will create the necessary tables for the app.
 
-# Start the Backend Server
+### Start the Backend Server
 You can use the built-in PHP server to run the Laravel backend
 
 ```bash
