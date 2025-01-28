@@ -41,12 +41,16 @@ const userReducer = (state = initialState, action: TaskActionTypes) => {
       userTasks: state.userTasks.map((task) =>
         task.id === action.payload.id ? action.payload : task
       ),
+      projectTasks: state.projectTasks.map((task) =>
+        task.id === action.payload.id ? action.payload : task
+      ),
     };
   case DELETE_TASK:
     return {
       ...state,
       tasks: state.tasks.filter((task) => task.id !== action.payload),
-      userTasks: state.userTasks.filter((task) => task.id !== action.payload)
+      userTasks: state.userTasks.filter((task) => task.id !== action.payload),
+      projectTasks: state.projectTasks.filter((task) => task.id !== action.payload),
     };
 
   case LOGOUT_USER:
