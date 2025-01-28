@@ -115,6 +115,8 @@ class TaskController extends Controller
             'project_id' => $request->project_id,
         ]);
 
+        $task->load('project');
+
         return response()->json($task);
     }
 
@@ -145,6 +147,8 @@ class TaskController extends Controller
             'assigned_to' => $request->has('assigned_to') ? $request->assigned_to : $task->assigned_to,
             'project_id' => $request->has('project_id') ? $request->project_id : $task->project_id,
         ]);
+        
+        $task->load('project');
     
         return response()->json($task);
     }

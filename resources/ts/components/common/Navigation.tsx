@@ -53,9 +53,9 @@ const Navigation = () => {
           {/* User Dropdown */}
           <div className="relative group">
             <button
-              className="flex bg-transparent text-white border border-white rounded-full py-2 px-4"
+              className="flex items-center bg-transparent text-white border border-white rounded-full py-2 px-4 max-w-full"
             >
-              <span className="flex-shrink-0">{ user && 'name' in user ? user.name : 'Guest' }</span>
+              <span className="flex-shrink-0 truncate">{ user && 'name' in user ? user.name : 'Guest' }</span>
               <span className="ml-4">&#9660;</span>
             </button>
             {user && (
