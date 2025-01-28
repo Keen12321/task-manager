@@ -29,7 +29,4 @@ export default defineConfig({
     emptyOutDir: true,
     publicPath: process.env.APP_URL || '/',
   },
-  server: {
-    https: true,
-  },
 });
